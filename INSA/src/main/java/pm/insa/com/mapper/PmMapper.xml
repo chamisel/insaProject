@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+    <!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="pm.insa.com.mapper.PmMapper">		<!-- DAO에서 선언할 namespace -->
+    						
+    <!-- test -->					
+  	<insert id="test" parameterType="pm.insa.com.vo.Test">
+	  		INSERT INTO TEST(name, sex, join_day)
+	  		VALUES(#{name}, #{sex}, TO_DATE(#{join_day}, 'YYYY-MM-DD'))
+  	</insert>
+	<!-- 인사 등록 -->
+	<insert id="insert" parameterType="pm.insa.com.vo.PmVo">
+			INSERT INTO INSA(sabun, 
+							join_day, 
+							retire_day, 
+							(SELECT code FROM PUB WHERE gubun='FF') AS put_yn, 
+							name, 
+							reg_no, 
+							eng_name, 
+							phone, 
+							hp, 
+							carrier, 
+							(SELECT code FROM PUB WHERE gubun='AA') AS pos_gbn_code,
+							cmp_reg_no, 
+							cmp_reg_image, 
+							sex, 
+							years, 
+							email, 
+							zip, 
+							addr1, 
+							addr2,
+							(SELECT code FROM PUB WHERE gubun='BB') AS dept_code, 
+							(SELECT code FROM PUB WHERE gubun='CC') AS join_gbn_code,
+							id, 
+							pwd,
+							salary, 
+							(SELECT code FROM PUB WHERE gubun='EE') AS kosa_reg_yn, 
+							(SELECT code FROM PUB WHERE gubun='KS') AS kosa_class_code, 
+							(SELECT code FROM PUB WHERE gubun='DD') AS mil_yn, 
+							(SELECT code FROM PUB WHERE gubun='MT') AS mil_type, 
+							(SELECT code FROM PUB WHERE gubun='ML') AS mil_level, 
+							mil_startdate, 
+							mil_enddate, 
+							(SELECT code FROM PUB WHERE gubun='GG') AS join_type, 
+							(SELECT code FROM PUB WHERE gubun='HH') AS gart_level, 
+							self_intro, 
+							crm_name, 
+							profile_image, 
+							carrier_image
+							) 
+					VALUES(#{sabun}
+						, #{join_day}
+						, #{retire_day}
+						, #{put_yn}
+						, #{name}
+						, #{reg_no}
+						, #{eng_name}
+						, #{phone}
+						, #{hp}
+						, #{carrier}
+						, #{pos_gbn_code}
+						, #{cmp_reg_no}
+						, #{cmp_reg_image}
+						, #{sex}
+						, #{years}
+						, #{email}
+						, #{zip}
+						, #{addr1}
+						, #{addr2}
+						, #{dept_code}
+						, #{join_gbn_code}
+						, #{id}
+						, #{pwd}
+						, #{salary}
+						, #{kosa_reg_yn}
+						, #{kosa_class_code}
+						, #{mil_yn}
+						, #{mil_type}
+						, #{mil_level}
+						, #{mil_startdate}
+						, #{mil_enddate}
+						, #{join_type}
+						, #{gart_level}
+						, #{self_intro}
+						, #{crm_name}
+						, #{profile_image}
+						, #{carrier_image}
+						)	
+	</insert> 
+	<!-- 리스트 조회 -->
+	<select id="getAll" resultType="pm.insa.com.vo.Member">
+			SELECT sabun, name, reg_no, hp, 
+				(SELECT P.gubun FROM PUB p, INSA i WHERE gubun='AA' AND p.code=i.pos_gbn_code) pos_gbn_code,
+				 join_day, retire_day, put_yn, salary FROM INSA ORDER BY sabun
+	</select>
+	<!-- 검색 리스트 -->
+	<select id="search" parameterType="pm.insa.com.vo.Member" resultType="pm.insa.com.vo.Member">
+			SELECT sabun, name, reg_no, hp, 
+				(SELECT P.gubun FROM PUB p, INSA i WHERE gubun='AA' AND p.code=i.pos_gbn_code) pos_gbn_code,
+				 join_day, retire_day, put_yn, salary FROM INSA ORDER BY sabun
+ 			 
+				 <where>
+				    <if test="name!= null and name!=''">
+				        name like  '%' || #{name} || '%'
+				    </if>
+				    <if test="pos_gbn_code!= null and pos_gbn_code!=''">
+				        AND pos_gbn_code=#{pos_gbn_code}
+				    </if>
+				    <if test="join_day!= null and join_day!=''">
+				        AND join_day like '%' || #{join_day} || '%'
+				    </if>
+				    <if test="retire_day!= null and retire_day!=''">
+				        AND retire_day like '%' ||#{retire_day} || '%'
+				    </if>
+				    <if test="join_gbn_code!= null and join_gbn_code!=''">
+				        AND join_gbn_code=#{join_gbn_code}
+				    </if>
+				  </where>
+	</select>
+	<!-- 공통 코드 가져오기 -->
+	<select id="getCommonCode" resultType="pm.insa.com.vo.PubVo">
+			SELECT gubun, code, name, note FROM PUB
+		</select>
+	<!-- 사번 증가 -->
+	<select id="getNewSabun" resultType="int">
+			SELECT NVL(MAX(sabun+1),1) FROM INSA
+	</select>
+	<!-- 개별 상세 보기 -->
+	<select id="insaDetail" resultType="pm.insa.com.vo.PmVo">
+			SELECT * FROM INSA WHERE sabun=#{sabun}
+	</select>
+	
+	<!-- 파일 저장 -->
+	<insert id="fileSaver" parameterType="java.util.Map">
+		    INSERT INTO file_data VALUES(#{file_content})   
+	</insert>
+	<!-- 파일 DB 저장 -->
+	<insert id="saveFileToDB" parameterType="pm.insa.com.vo.FileSaver" >
+			INSERT INTO INSA_FILE(sabun, file_type, file_name, file_content) 
+						VALUES(#{sabun}, #{file_type}, #{file_name}, #{file_content})
+	</insert>
+	<!-- 정보 삭제 -->
+	<delete id="delete">
+			DELETE FROM INSA WHERE sabun=#{sabun}
+	</delete>
+	<!-- 정보 수정 -->
+	<update id="update" parameterType="pm.insa.com.vo.PmVo">
+			UPDATE INSA 
+			SET 
+			profile_image=#{profile_image},
+			name=#{name}, 
+			eng_name=#{eng_name}, 
+			id=#{id},pwd=#{pwd},
+			hp=#{hp},
+			reg_no=#{reg_no},
+			age=#{age},
+			email=#{email},
+			sex=#{sex},
+			zip=#{zip},
+			addr1=#{addr1},
+			addr2=#{addr2},
+			pos_gbn_code=#{pos_gbn_code},
+			dept_code=#{dept_code},
+			salary=#{salary},
+			mil_yn=#{mil_yn},
+			mil_type=#{mil_type},
+			mil_level=#{mil_level},
+			mil_startdate=#{mil_startdate},
+			mil_enddate=#{mil_enddate},
+			kosa_reg_yn=#{kosa_reg_yn},
+			kosa_class_code=#{kosa_class_code},
+			join_day=#{join_day},
+			retire_day=#{retire_day}, 
+			cmp_reg_no=#{cmp_reg_no},
+			cmp_name=#{cmp_name},
+			cmp_reg_imagefile=#{cmp_reg_imagefile},
+			resume_file=#{resume_file},
+			self_intro=#{self_intro}, 
+			join_gbn_code=#{join_gbn_code}, 
+			put_yn=#{put_yn}
+			WHERE sabun=#{sabun}
+	</update>
+	<!-- 투입여부  바인딩 -->
+	<select id="putYn" resultType="pm.insa.com.vo.PubVo">>
+		SELECT code, name FROM PUB WHERE gubun
+	</select>
+    </mapper>
