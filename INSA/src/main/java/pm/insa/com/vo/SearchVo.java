@@ -9,6 +9,7 @@ public class SearchVo {
 	private String join_day;
 	private String retire_day;
 	private String join_gbn_code;
+	
 	public String getSabun() {
 		return sabun;
 	}

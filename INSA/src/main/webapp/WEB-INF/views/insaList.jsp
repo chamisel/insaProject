@@ -20,8 +20,7 @@
 
 	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script type="text/javascript">
-	function loadCommonCode(){
-	}
+
 	function resetAll(){
  		var thisForm = arguments[0];
 		for(var i=0 ; i<thisForm.length ; i++){
@@ -35,14 +34,7 @@
 		
 	}
 		
- 		$('#reset').click(function(){
-			alert("reset");
-			$(":text").val()="";
-//			$(":option").value="";
-			document.getElementById("sabun").disabled=false;
-			document.getElementsByClassName("form-control").disabled=false;
-		}); 
-								
+					
 				
 				
  				/* document.getElement
@@ -51,45 +43,47 @@
 	
 	//검색
 	function send(){
-		var inputForm = arguments[0];
+		var selectForm = arguments[0];
 		var flagForSend = true;
 		var str="";
-		for (var idx=0 ; idx<inputForm.elements.length; idx++){				//폼의 모든 elements 가져오기
-			if(inputForm.elements[idx].value.trim().length>0 && inputForm.elements[idx].type!="button"){	//값이 있는지 확인
-				str += "인풋의 "+inputForm.elements[idx].name+"에 값있음 : "+inputForm.elements[idx].value+"\n";
+		for (var idx=0 ; idx<selectForm.elements.length; idx++){				//폼의 모든 elements 가져오기
+			if(selectForm.elements[idx].value.trim().length>0 && selectForm.elements[idx].type!="button"){	//값이 있는지 확인
+				str += "인풋의 "+selectForm.elements[idx].name+"에 값있음 : "+selectForm.elements[idx].value+"\n";
 				flagForSend=false;		//값이 있으면 getList, 값이 없으면 getAll
 			}else{
+				flagForSend=true;	
 				str="인풋에 값없음";
 			}
 		}
+		console.log(selectForm.elements.length);
 		console.log(str);
 		var getterList;
-		if(flagForSend){
+		if(flagForSend=true){
 			console.log("----------전체불러오기----------");
 			ajaxCall_forGetAll(1);
 			
- 			inputForm.action="getAll";
-			inputForm.method="post";
-			inputForm.submit(); 
+ 			selectForm.action="getAll";
+			selectForm.method="post";
+			selectForm.submit(); 
 
 		}else{
 			console.log("------------조건불러오기---------");
 			ajaxCall_forGetList();
 			
- 			inputForm.action="get";
-			inputForm.method="post";
-			inputForm.submit(); 
+ 			selectForm.action="search";
+			selectForm.method="post";
+			selectForm.submit(); 
 
 		}
 	}
 	
 	function ajaxCall_forGetAll(thisPage){
 		console.log("겟페이지:::ajaxCall_forGetAll(thisPage):::"+thisPage);
+		console.log("////////////////////전체실행////////////////////");
 		var formData = new FormData();
 		formData.append("page",thisPage);
 		$.ajax({
-//			url: "getAll",
-			url: "goPaging",
+			url: "getAll",
 			data : formData,
 			type:"post",
 			processData : false,
@@ -112,7 +106,7 @@
 				
 				$('#listView').html(data);
 				if(data.indexOf("검색된 데이터가 없습니다.")>0){
-					alert("해당 결과가 없습니다.");
+					
 				}
 				
 		    },
@@ -124,21 +118,21 @@
 		});
 	}
 	function ajaxCall_forGetList(){
-		console.log("JSON:"+JSON.stringify($('#inputForm').serializeObject()));
+		console.log("JSON:"+JSON.stringify($('#selectForm').serializeObject()));
 		$.ajax({
 			headers: { 
-				'Accept': 'application/json',
-			    'Content-Type': 'application/json' 
+//				'Accept': 'application/json',
+//			    'Content-Type': 'application/json' 
 		    },
-			url: "get",
+			url: "search",
 			type:"post",
-			dataType : 'json',
-			data:JSON.stringify($('#inputForm').serializeObject()),
+//			dataType : 'json',
+			data:JSON.stringify($('#selectForm').serializeObject()),
 			contentType: 'application/json;charset=UTF-8' ,
-			traditional:true,
+	//		traditional:true,
 	        //Ajax 성공시
 			success : function(data){
-				console.log("--------불러오기 성공-------\n DATA : ", data);
+				console.log("--------불러오기 성공-------\n DATA : ");
 	//			console.log("데이타 확인 0번 : "+data[0].sabun);
 				if(data.length!=0){
 					makeList(data);
@@ -159,8 +153,9 @@
 		var obj = null;
 		try {
 			if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
-				console.log("getPage:::serializeObject 실행");
+				console.log("insaList:::serializeObject 실행");
 				var arr = this.serializeArray();
+				console.log(arr);
 				if(arr){ 
 					obj = {};
 					jQuery.each(arr, function() {
@@ -183,27 +178,51 @@
 			for(var idx=0 ; idx<list.length ; idx++){
 				var row = list[idx];
 				var join
-				console.log("투입여부 : "+row.inandout);
-				var strInandout;
-				if(row.inandout==1){
-					strInandout="투입";
-				}else{
-					strInandout="미투입";
+				console.log("투입여부 : "+row.put_yn);
+				
+				var strput_yn;
+				var strpos_gbn_code;
+				if(row.put_yn==1){
+					strput_yn="투입";
+				}else {
+					strput_yn="미투입";
+				}
+						
+			
+				console.log("직위 : "+row.pos_gbn_code);
+				if(row.pos_gbn_code == null) {
+					   strpos_gbn_code = "";
+				} 
+				if(row.pos_gbn_code=="0001"){
+					strpos_gbn_code="사원";
+				}else if(row.pos_gbn_code=="0002"){
+					strpos_gbn_code="대리";
+				}else if(row.pos_gbn_code=="0003"){
+					strpos_gbn_code="과장";
+				}else if(row.pos_gbn_code=="0004"){
+					strpos_gbn_code="차장";
+				}else if(row.pos_gbn_code=="0005"){
+					strpos_gbn_code="부장";
+				}else if(row.pos_gbn_code=="0006"){
+					strpos_gbn_code="사장";
 				}
 				html +="<tr class=\"resultRow\" onclick=\"resultRowClick(this)\"><td class=\"td_sabun\">"+row.sabun+"</td><td>"
 					+row.name+"</td><td>"+row.reg_no+"</td><td>"
-					+row.hp+"</td><td>"+row.pos_gbn_code+"</td><td>"
+					+row.hp+"</td><td>"+strpos_gbn_code+"</td><td>"
 					+row.join_day+"</td><td>"+row.retire_day+"</td><td>"
-					+strInandout+"</td><td align=\"right\">"+comma(row.salary)+"</td></tr>";
+					+strput_yn+"</td><td align=\"right\">"+comma(row.salary)+"</td></tr>";
+			
+				
+				
+				
 			}
 		} 
 		
-
-
+	
 		$('#listView').html(html);
 //		$('#listView').innerHTML = html;
-// 		console.log("html : " + $('#listView').html());
-//        console.log("후 : " + $('#listTable').html()); 
+ 		console.log("html : " + $('#listView').html());
+        console.log("후 : " + $('#listTable').html()); 
         
 
 
@@ -236,8 +255,43 @@
          document.body.appendChild(form);
          form.submit();
 	}
-	
-	
+	function loadCommonCode(){
+		$.ajax({
+//			headers: { 
+//				 'Accept': 'application/json',
+//			      'Content-Type': 'application/json' 
+//		    },
+			url:"getcommonCode",
+			type:"post",
+//			dataType : 'json',
+//			data:{ "commonCodeType" : commonCodeType },
+//			contentType: 'application/json;charset=UTF-8' ,
+
+//			traditional:true,
+				
+		        //Ajax 성공시
+			success : function(data){
+				console.log("로딩성공", data);
+				//console.log("데이타 보기"+data[8].code);
+				var commonCode;
+				for(var i=0 ; i<data.length ; i++){
+					if(data[i].gubun=="AA"){
+						document.selectForm.pos_gbn_code.options.add(
+								new Option(data[i].name));
+					}else if(data[i].gubun=="FF"){
+						document.selectForm.put_yn.options.add(
+								new Option(data[i].name));
+					}
+				}
+		        //Ajax 실패시
+		    },error : function(status, error,request, data){
+		    	console.log("로딩실패\n"+status+"\n"+error+"\n"+request.responseText+"\n"+request.status+"\n////////");
+		   		return;
+		    }
+		});
+		
+		
+	}
 	/* function pagingCounter(){
 		var totalCount;
 		$.ajax({
@@ -259,17 +313,32 @@
 	
 	$(document).ready(function(){
 		loadCommonCode();
-		/* $('.resultRow').click(function(){
-			alert("resultRow 선택");
+		$('#put_yn').change(function(){
+			console.log($('#put_yn').val());
+		});
+		$('#pos_gbn_code').change(function(){
+			console.log($('#pos_gbn_code').val());
+		});
+		
+		$('.resultRow').click(function(){
 			var theSabun = $(this).children().eq(0).text();
 			alert("선택 사번 : "+theSabun);
-			location.href="/sys/getOne?sabun="+theSabun;
-		}); */
+			location.href="/insaDetail?sabun="+theSabun;
+		});  
+
+/* 	 		$('#reset').click(function(){
+				alert("reset");
+				$(":text").val()="";
+//				$(":option").value="";
+				document.getElementById("sabun").disabled=false;
+				document.getElementsByClassName("form-control").disabled=false;
+			});  */
+				
 		
-		 //검색
+		/*  //검색
 		 $('#search').click(function(){
 				location.href="/getAll";
-		});  
+		});   */
 		//초기화
 		$('#reset').click(function(){
 				location.href="/insaList";
@@ -284,14 +353,14 @@
 		$('#sabun').focus(function(){
 			$(".form-control").attr("disabled", true);
 			
-/* 			if(inputForm.sabun.value.trim()!=""){
+/* 			if(selectForm.sabun.value.trim()!=""){
 			}else{
 				$(":disabled").attr("disabled", false);
 			}
  */		});	
 		
 		/* $('#sabun').blur(function(){
-			if(inputForm.sabun.value.trim()==""){
+			if(selectForm.sabun.value.trim()==""){
 				$(":disabled").attr("disabled", false);
 //				$(".form-control").attr("disabled", false);
 				insaList.sabun.value="";
@@ -343,11 +412,11 @@
 		</div>
 	<body>
 	<h1 style="margin-top: 0px;">직원 리스트</h1>
-	<form id="selectInsa" name="selectInsa"action="/getAll" method="post">
+	<form id="selectForm" name="selectForm" action="/getAll" method="post">
 		<!-- 버튼 라인 -->
 		
-			<input type="submit" id="search" name="search" value="검색" /> <!-- onclick="send(this.form)" -->
-			<input type="button" id="reset" value="초기화" onclick="reset"/> <!-- onclick="resetAll(this.form)" -->
+			<input type="button" id="search" value="검색" onclick="send(this.form)"/>
+			<input type="button" id="reset" value="초기화" onclick="reset"/>
 			<input type="button" id="forward" value="전화면" />
 			<hr>
 		<table>
@@ -356,23 +425,20 @@
 				<!-- 사번 -->
 					<td>사번</td>
 					<td>
-						<input type="text"  id="sabun" name="sabun" style="text-align: right;"  value="">
+						<input type="text"  id="sabun" name="sabun" style="text-align: right;">
 					</td>
 				<!-- 성명 -->
 					<td>성명</td>
 					<td>
-						<input type="text" class="form-control" id="name" name="name" style="text-align: right;" value="">
+						<input type="text" class="form-control" id="name" name="name" style="text-align: right;">
 					</td>
-				<!-- 입사여부 -->
-					<td>입사여부</td>
+				<!-- 입사구분 -->
+					<td>입사구분</td>
 					<td>
-						<select class="form-control" name="join_type"  value="0">
-							<option value="0">(선택)</option>
-							<option value="1">근무중</option>
-							<option value="2">퇴사</option>
+						<select class="form-control" id="put_yn" name="put_yn">
+							<option></option>
 						</select>
-					</td>
-				
+					</td>				
 				</tr>
 					
 			<!-- 2번째 줄 -->
@@ -380,23 +446,19 @@
 				<!-- 직위 -->
 					<td>직위</td>
 					<td>
-						<select name="pos_gbn_code" id="pos_gbn_code" value="0">
-							<option value="0">(선택)</option>
-							<option value="1">(사원)</option>
-							<option value="2">(주임)</option>
-							<option value="3">(대리)</option>
-							<option value="4">(과장)</option>
+						<select name="pos_gbn_code" id="pos_gbn_code" value="">
+							<option></option>
 						</select>
 					</td>
 				<!-- 입사일자 -->
 					<td>입사일자</td>
 					<td>
-							<input type="date" id="join_day" name="join_day" class="form-control" value="">
+						<input type="date" id="join_day" name="join_day" class="form-control">
 					</td>
 				<!-- 퇴사일자 -->
 					<td>퇴사일자</td>
 					<td>
-							<input type="date" id="retire_day" name="retire_day" class="form-control" value="">
+						<input type="date" id="retire_day" name="retire_day" class="form-control">
 					</td>
 				
 				</tr>
@@ -422,10 +484,6 @@
 			</tr>
 		</thead>
 		<tbody id="listView">
-			<tr>
-				<td colspan="9" align="center">검색된 데이터가 없습니다.</td>
-			</tr>
-		
 			<c:choose>
 				<c:when test="${empty list || list==null }">
 					<tr>
@@ -435,15 +493,15 @@
 				 <c:otherwise>
 					<c:forEach  items="${list}" var="searchResult">
 						<tr class="resultRow">
-								<td id="td_sabun"><a href="/insaDetail?pickSabun=${searchResult.sabun}">${searchResult.sabun}</td>
-								<td id="td_name">${searchResult.name}</a></td>
-								<td id="td_reg_no">${searchResult.reg_no}</td>
-								<td id="td_hp">${searchResult.hp}</td>
-								<td id="td_pos_gbn_code">${searchResult.pos_gbn_code}</td>
-								<td id="td_join_day">${searchResult.join_day}</td>
-								<td id="td_retire_day">${searchResult.retire_day}</td>
-								<td id="td_put_yn">${searchResult.put_yn}</td>
-								<td id="td_salary">${searchResult.salary}</td>
+								<td align="center" id="td_sabun"><a href="/insaDetail?pickSabun=${searchResult.sabun}">${searchResult.sabun}</td>
+								<td align="center" id="td_name">${searchResult.name}</a></td>
+								<td align="center" id="td_reg_no">${searchResult.reg_no}</td>
+								<td align="center" id="td_hp">${searchResult.hp}</td>
+								<td align="center" id="td_pos_gbn_code">${searchResult.pos_gbn_code}</td>
+								<td align="center" id="td_join_day">${searchResult.join_day}</td>
+								<td align="center" id="td_retire_day">${searchResult.retire_day}</td>
+								<td align="center" id="td_put_yn">${searchResult.put_yn}</td>
+								<td align="right" id="td_salary">${searchResult.salary}</td>
 						</tr>
 					</c:forEach>
 				</c:otherwise>			

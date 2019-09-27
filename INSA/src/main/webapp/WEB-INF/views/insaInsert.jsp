@@ -11,16 +11,16 @@
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-	
 	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 	<script type="text/javascript">
+
 	$(document).ready(function(){
 		console.log("다큐준비");
 	});
 		$(document).ready(function onload(){		//처음 로딩시 실행
 //			var flag_onload = false;
 			console.log("onload()실행");
-//			loadCommonCode();
+			loadCommonCode();
 			
 			
 				//이름칸 한글만 입력 가능
@@ -41,30 +41,7 @@
 	 			}
 			});
 			
-	//datepicker +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-	         //input을 datepicker로 선언
-		     $("#join_day, #retire_day, .datepicker").datepicker({
-			             dateFormat: 'yy-mm-dd' //Input Display Format 변경
-			             ,showOtherMonths: true //빈 공간에 현재월의 앞뒤월의 날짜를 표시
-			             ,showMonthAfterYear:true //년도 먼저 나오고, 뒤에 월 표시
-			             ,changeYear: true //콤보박스에서 년 선택 가능
-			             ,changeMonth: true //콤보박스에서 월 선택 가능                
-			             ,showOn: "both" //button:버튼을 표시하고,버튼을 눌러야만 달력 표시 ^ both:버튼을 표시하고,버튼을 누르거나 input을 클릭하면 달력 표시  
-			             ,buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif" //버튼 이미지 경로
-			             ,buttonImageOnly: true //기본 버튼의 회색 부분을 없애고, 이미지만 보이게 함
-			             ,buttonText: "선택" //버튼에 마우스 갖다 댔을 때 표시되는 텍스트                
-			             ,yearSuffix: "년" //달력의 년도 부분 뒤에 붙는 텍스트
-			             ,monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'] //달력의 월 부분 텍스트
-			             ,monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'] //달력의 월 부분 Tooltip 텍스트
-			             ,dayNamesMin: ['일','월','화','수','목','금','토'] //달력의 요일 부분 텍스트
-			             ,dayNames: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'] //달력의 요일 부분 Tooltip 텍스트
-			//             ,minDate: "-1M" //최소 선택일자(-1D:하루전, -1M:한달전, -1Y:일년전)
-			//             ,maxDate: "+1M" //최대 선택일자(+1D:하루후, -1M:한달후, -1Y:일년후)                
-	         });
-	         
-	         //초기값을 오늘 날짜로 설정
-		     $("#join_day, #retire_day, .datepicker").datepicker(); //(-1D:하루전, -1M:한달전, -1Y:일년전), (+1D:하루후, -1M:한달후, -1Y:일년후)            
-			 
+	
 		     //입사일을 기입하면 퇴사일 활성화
 		     $("#join_day").change(function(){
 				 if($("#join_day").val().trim()==""){
@@ -83,10 +60,10 @@
 		     
 			//저장++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				$('#save').click(function(){
-					existThisMember($('#sabun').val());
-						
+					 existThisMember($('#sabun').val());
+					console.log($('#sabun').val());
 				});
-					
+	
 				//초기화시, 다시 사번 받아오기++++++++++++++++++++++++++++++
 				$('#reset').click( function(){
 					location.href="/reset";
@@ -138,8 +115,7 @@
 					var email = document.inputForm.email_1.value + document.inputForm.email_2.value;
 					document.inputForm.email.value = email;
 				});
-				
-				
+
 				//군관련 보이기++++++++++++++++++++++++++++++
 				$(".mil").hide();
 				$("#mil_yn").change(function(){
@@ -172,7 +148,7 @@
 				   			flag_reg_no=true;
 				   			alert("13자리 아님");
 					}else{
-						var ageCheck = jumin.val().substring(0,2);
+						var yearsCheck = jumin.val().substring(0,2);
 						var genderCheck = jumin.val().substring(6,7);
 			   			if(genderCheck=="1" || genderCheck=="2"){
 					        //"-" 넣기
@@ -186,10 +162,10 @@
 					        	$("#sex").val("2");
 					        }
 					       //나이계산 
-					        var birthday = new Date(ageCheck);
+					        var birthday = new Date(yearsCheck);
 					        var today = new Date(); 
 					        var years = today.getFullYear() - birthday.getFullYear();
-					        $("#age").val(years+1);
+					        $("#years").val(years+1);
 
 					        flag_reg_no=false;
 			   			}else{
@@ -207,12 +183,12 @@
 				//새로 포커스가 올 경우 모두 지우기
 				$("#reg_no").focus(function(){
 					$("#reg_no").val("");
-					$("#age").val("");
+					$("#years").val("");
 					$("#sex").val("0");
 				});
 				
 				
-				//파일 저장+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				/* //파일 저장+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				$('#pic_file, #cmp_reg, #resume').change(function() {
 			        var formData = new FormData($("#inputForm")[0]);
 			        formData.append("fileUploadFor",$(this).attr("name"));
@@ -243,7 +219,7 @@
 		            });
 		        });
 				
-				
+				 */
 				$('#phone').change(function(){
 					if($('#phone').val()==formatPhone($('#phone').val())){
 						alert("전화번호 오류");
@@ -263,6 +239,7 @@
 					}
 				});
 				
+
 				
 				$('#salaryShow').blur(function(){
 					console.log("변경전 콤마값 ::::::::"+$('#salaryShow').val());
@@ -387,25 +364,19 @@
 			console.log("necessary클래스 미입력\n"+strNames);
 			console.log("비번재입력확인 : "+document.inputForm.passwordCheck.value);
 			if(flag && document.inputForm.passwordCheck.value=="true"){
-	/* 				var formObj = document.inputForm;
-				formObj.action="input";
+	 			/* var formObj = document.inputForm;
+				formObj.action="insaInsert";
 				formObj.method="post";
-				formObj.submit();
-	*/
+				formObj.submit(); */
+	
 //					var param = $('#inputForm').serialize();
 				$.ajax({
-				headers: { 
-					'Accept': 'application/json',
-				    'Content-Type': 'application/json' 
-				 },
-	 			url:"input",
+	 			url:"insaInsert",
 				type:"post",
 //				dataType : 'json',
 				data:JSON.stringify($('#inputForm').serializeObject()), //$('#inputForm').serializeObject()),
-//				contentType: 'application/json;charset=UTF-8' ,
-
-//				traditional:true,
-						
+				contentType: 'application/json;charset=UTF-8' ,
+//				traditional:true,		
 				//Ajax 성공시
 				success : function(data){
 					alert("저장성공");
@@ -475,6 +446,7 @@
 				alert("***********필수항목 미입력***********\n"+strNames+"\n+++++++++++필수값을 입력해주세요.+++++++++++");
 			}
 		}
+		//주소 api
 		function sample6_execDaumPostcode() {
 	        new daum.Postcode({
 	            oncomplete: function(data) {
@@ -547,6 +519,7 @@
 				if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
 					console.log("serializeObject 실행");
 					var arr = this.serializeArray();
+					console.log(arr);
 					if(arr){ 
 						obj = {};
 						jQuery.each(arr, function() {
@@ -558,10 +531,12 @@
 				alert(e.message);
 			}finally { } 
 			return obj;
+			conlole.log(obj);
 		}
 		//json타입으로 바꾸기2++++++++++++++++++++++++++++++++++++++++++++++++++확인하기
 		function objToJson(formData){
 			var data = formData;
+			conlole.log(data);
 			var obj = {};
 			$.each(data, function(idx, ele){
 			obj[ele.name] = ele.value;
@@ -810,10 +785,10 @@
 //					 'Accept': 'application/json',
 //				      'Content-Type': 'application/json' 
 //			    },
-				url:"getcommonCode"
+				url:"getcommonCode",
 				type:"post",
 //				dataType : 'json',
-//				data:{"list" : list},
+//				data:{ "commonCodeType" : commonCodeType },
 //				contentType: 'application/json;charset=UTF-8' ,
 
 //				traditional:true,
@@ -821,7 +796,7 @@
 			        //Ajax 성공시
 				success : function(data){
 					console.log("로딩성공", data);
-					console.log("데이타 보기"+data[0].code);
+					//console.log("데이타 보기"+data[8].code);
 					var commonCode;
 					for(var i=0 ; i<data.length ; i++){
 						if(data[i].gubun=="AA"){
@@ -839,9 +814,28 @@
 						}else if(data[i].gubun=="KS"){
 							document.inputForm.kosa_class_code.options.add(
 									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="CC"){
+							document.inputForm.join_gbn_code.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="DD"){
+							document.inputForm.mil_yn.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="GG"){
+							document.inputForm.join_type.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="HH"){
+							document.inputForm.gart_level.options.add(
+									new Option(data[i].name, data[i].code));
 						}else if(data[i].gubun=="FF"){
 							document.inputForm.put_yn.options.add(
 									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="EE"){
+							document.inputForm.kosa_reg_yn.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="II"){
+							document.inputForm.email_2.options.add(
+									new Option(data[i].name, data[i].code));
+						}
 					}
 			        //Ajax 실패시
 			    },error : function(status, error,request, data){
@@ -885,114 +879,6 @@
 			$imageContainer.append(strDOM);
 		}
 		*/
-
-
-		
-		// 주소검색을 수행할 팝업 페이지를 호출합니다.
-		function goPopup(){
-			// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(http://www.juso.go.kr/addrlink/addrLinkUrl)를 호출하게 됩니다.
-			var pop = window.open("jusoPopup","pop","width=590,height=420, scrollbars=yes, resizable=yes"); 
-		}
-		// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
-		function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,detBdNmList,bdNm,bdKdcd,siNm,sggNm,emdNm,liNm,rn,udrtYn,buldMnnm,buldSlno,mtYn,lnbrMnnm,lnbrSlno,emdNo){
-				document.inputForm.addr1.value = roadAddrPart1; // 도로명주소
-				document.inputForm.addr2.value = addrDetail; // 상세주소
-				document.inputForm.zip.value = zipNo; // 우편번호
-				self.close();
-		}
-		
-	/*
-	// 주소 API 적용 시작 
-		 
-	    // 주소 검색
-	    function Search_Post_API(PageNo) {
-	 
-	        var intPageSize = 10;
-	        var intTotalPages = 0;
-	 
-	        // 검색API URL은 프로토콜(http/https) 맞춰서 설정한다.
-	        var strUrl = window.location.protocol + "//www.juso.go.kr/addrlink/addrLinkApiJsonp";
-	        
-	        if (!searchJuso()) {
-	            try {
-	                $.ajax({
-	                    url: strUrl
-	                    , type: "post"
-	                    , data: ({ currentPage: PageNo, countPerPage: intPageSize, keyword: $("#txt_SearchText").val(), confmKey: $("#hid_Key").val() })
-	                    , dataType: "jsonp"
-	                    , crossDomain: true
-	                    , success: function (xmlStr) {
-	 
-	                        if (navigator.appName.indexOf("Microsoft") > -1) {
-	                            var xmlData = new ActiveXObject("Microsoft.XMLDOM");
-	                            xmlData.loadXML(xmlStr.returnXml)
-	                        } else {
-	                            var xmlData = xmlStr.returnXml;
-	                        }
-	 
-	                        var errCode = $(xmlData).find("errorCode").text();
-	                        var errDesc = $(xmlData).find("errorMessage").text();
-	                        var PostList = "";
-	 
-	                        if (errCode == "0") {
-	                            if (xmlStr != null) {
-	 
-	                                PostList += "<p><strong>" + $(xmlData).find("totalCount").text() + "개</strong>의 주소가 검색되었습니다.</p>";
-	 
-	                                PostList += "<ul>";
-	 
-	                                $(xmlData).find("juso").each(function (i) {
-	                                    PostList += "<li>";
-	                                    PostList += "<a href=\"javascript:SetOpenerValue('" + $(xmlData).find("zipNo").eq(i).text() + "', '" + $(xmlData).find("roadAddr").eq(i).text().replace("'"," ") + "');\">";
-	                                    PostList += "<em>" + $(xmlData).find("zipNo").eq(i).text() + "</em>";
-	                                    PostList += "<span>" + $(xmlData).find("roadAddr").eq(i).text() + "<br/>" + $(xmlData).find("jibunAddr").eq(i).text() + "</span>";
-	                                    PostList += "</a>";
-	                                    PostList += "</li>";
-	                                });
-	 
-	                                PostList += "</ul>";
-	 
-	                                $("#dvSearchArea").html(PostList);
-	 
-	                                // 페이징
-	                                if ($(xmlData).find("totalCount").text() != 0) {
-	                                    intTotalPages = Math.ceil($(xmlData).find("totalCount").text() / intPageSize);
-	                                    $("#div_paginate").html(PageLink(PageNo, intTotalPages, "Search_Post_API"));
-	                                }
-	 
-	                            }
-	                        } else if (errCode == "E0005") {
-	                            alert("검색어를 입력해주세요.");
-	                        } else if (errCode == "E0006") {
-	                            alert("주소를 상세히 입력해주세요.");
-	                        } else { // 에러발생시 주소DB 호출
-	                            ErrorJuso();
-	                        }
-	                    }
-	                    , error: function (xhr, status, error) {
-	                        ErrorJuso();
-	                    }
-	                });
-	            } catch (e) {
-	                ErrorJuso();
-	            }
-	        }
-	        return;
-	    }
-	 
-	    // 검색 API 서비스 오류
-	    function ErrorJuso() {
-	        alert("에러발생 시 코드 작성");
-	    }
-	 
-	    // 검색 API 호출 전 검색어 체크
-	    function searchJuso() {
-	        if (!checkSearchedWord($("#txt_SearchText").val().toUpperCase())) {
-	            return true;
-	        } else {
-	            return false;
-	        }
-	    }
 	 
 	    // 특수문자, 특정문자열(sql예약어의 앞뒤공백포함) 제거
 	    function checkSearchedWord(obj) {
@@ -1021,51 +907,7 @@
 	        return true;
 	    }
 	 
-	    // 임시 페이징
-	    function PageLink(curPage, totalPages, funName) {
-	 
-	        pageUrl = "";
-	 
-	        var pageLimit = 5;
-	        var startPage = parseInt((curPage - 1) / pageLimit) * pageLimit + 1;
-	        var endPage = startPage + pageLimit - 1;
-	 
-	        if (totalPages < endPage) {
-	            endPage = totalPages;
-	        }
-	 
-	        var nextPage = endPage + 1;
-	 
-	        if (curPage > 1 && pageLimit < curPage) {
-	            pageUrl += "<a class='first' href='javascript:" + funName + "(1);'><img src='/images_new/common/2016/btn_paging_first.gif' alt='처음' /></a>";
-	        }
-	        if (curPage > pageLimit) {
-	            pageUrl += " <a class='prev' href='javascript:" + funName + "(" + (startPage == 1 ? 1 : startPage - 1) + ");'><img src='/images_new/common/2016/btn_paging_prev.gif' alt='이전' /></a>";
-	        }
-	 
-	        for (var i = startPage; i <= endPage; i++) {
-	            if (i == curPage) {
-	                pageUrl += " <a href='#'><strong>" + i + "</strong></a>"
-	            } else {
-	                pageUrl += " <a href='javascript:" + funName + "(" + i + ");'> " + i + " </a>";
-	            }
-	        }
-	 
-	        if (nextPage <= totalPages) {
-	            pageUrl += "<a class='next' href='javascript:" + funName + "(" + (nextPage < totalPages ? nextPage : totalPages) + ");'><img src='/images_new/common/2016/btn_paging_next.gif' alt='다음' /></a>";
-	        }
-	        if (curPage < totalPages && nextPage < totalPages) {
-	            pageUrl += "<a class='last' href='javascript:" + funName + "(" + totalPages + ");'><img src='/images_new/common/2016/btn_paging_last.gif' alt='끝' /></a>";
-	        }
-	 
-	        return pageUrl;
-	    }
-	  
-	    // 주소 API 적용 끝 
-			//출처: http://ggmouse.tistory.com/178 [초보개발자꽁쥐] 
-	  */
-	  
-//		[출처] input text 숫자 입력시 자동으로 콤마(,) 입력하기|작성자 마요네즈
+
 		function inputNumberFormat(obj) { 
 			    obj.value = comma(uncomma(obj.value)); 
 		} 
@@ -1077,11 +919,11 @@
 		    str = String(str); 
 		    return str.replace(/[^\d]+/g, ''); 
 		}
+
 		
 </script>
 
-</head>
-<body style="padding: 30px">
+<head><body style="padding: 30px">
 
 	<div align="right">
 	   <h2>IT & BIZ</h2>
@@ -1092,83 +934,81 @@
 	</div>
 	<h1>직원 등록</h1>
 	<form id="inputForm" name="inputForm" action="/insaInsert" method="post">
-		<div style="float: right;" >
+		<div style="float: right;">
 			<!-- <button type="submit" name="save" id="save" value="저장">저장</button> -->
-			<input type="submit" id="save" name="save" value="저장"/>
-			<input type="reset" id="reset" name="reset" value="초기화"/>
-			<input type="button" id="forward" name="forward" value="전화면"/>
+			<input type="button" id="save" name="save" value="저장">
+			<input type="reset" id="reset" name="reset" value="초기화">
+			<input type="button" id="forward" name="forward" value="전화면">
 		</div>
 	<hr>
 		<table>
 			<tr>
 				<td rowspan="6" align="center">
-					<img alt="사진" src="resources/image/user-empty.png" name="profile_image" id="profile_image"  value="1" class="img-circle" width="100px" height="100px" > <!--alt="사진" src="resources/image/user-empty.png"  -->
+					<img alt="사진" src="resources/image/user-empty.png" name="profile_image" id="profile_image" value="1" class="img-circle" width="100px" height="100px"> <!--alt="사진" src="resources/image/user-empty.png"  -->
 					<br>
-					<input type="file" name="profile_image" id="profile_image" accept=".bmp, .gif, .jpg, .png" onchange="getThumbnailPrivew(this, 'picture');">
-					<input type="hidden" name="profile_image_name" id="profile_image_name" >
+					<input type="text" name="profile_image" id="profile_image" accept=".bmp, .gif, .jpg, .png" onchange="getThumbnailPrivew(this, 'picture');">
+					<input type="hidden" name="profile_image_name" id="profile_image_name">
 				</td> 
 			</tr>
 			<tr>
 				<td>*사번</td>
 				<td>
-					<input type="text" name="sabun" id="sabun" value="${newSabun}" class="necessary" style="background-color:lightgrey" />
+					<input type="text" name="sabun" id="sabun" value="${newSabun}" class="necessary" style="background-color:lightgrey">
 				</td>
 				<td>*한글성명</td>
 				<td>
-					<input type="text" title="한글성명" name="name" id="name" class="necessary" />
+					<input type="text" title="한글성명" name="name" id="name" value="한글" class="necessary">
 				</td>
 				<td>영문성명</td>
 				<td>
-					<input type="text" name="eng_name" id="eng_name" value=""/>
+					<input type="text" name="eng_name" id="eng_name" value="">
 				</td>
 			</tr>
 			<tr>
 				<td>*아이디</td>
 				<td>
-					<input type="text" title="아이디" name="id" id="id" class="necessary" />
+					<input type="text" title="아이디" name="id" id="id" value="123" class="necessary">
 				</td>
 				<td>*비밀번호</td>
 				<td>
-					<input type="password" title="비밀번호" name="pwd" id="pwd" class="necessary" />
+					<input type="password" title="비밀번호" name="pwd" id="pwd" class="necessary">
 				</td>
 				<td>*비밀번호 확인</td>
 				<td>	
-					<input type="password" name="repwd" id="repwd" disabled="disabled"/>
-					<input type="hidden" name="passwordCheck" id="passwordCheck" value="false" />
+					<input type="password" name="repwd" id="repwd">
+					<input type="hidden" name="passwordCheck" id="passwordCheck" value="false">
 				</td>
 			</tr>
 			<tr>
 				<td>전화번호</td>
 				<td>
-					<input type="text" name="phone" id="phone" onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)'value=""/>
+					<input type="text" name="phone" id="phone" onkeydown="return onlyNumber(event)" onkeyup="removeChar(event)" value="">
 				</td>
 				<td>*핸드폰번호</td>
 				<td>
-					<input type="text" title="핸드폰번호" name="hp" id="hp" class="necessary" onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' />
+					<input type="text" title="핸드폰번호" name="hp" id="hp" value="01012341234" class="necessary" onkeydown="return onlyNumber(event)" onkeyup="removeChar(event)">
 				</td>
 				<td>주민번호</td>
 				<td>
-					<input type="text" name="reg_no" id="reg_no" placeholder="******-*******"/>
+					<input type="text" name="reg_no" id="reg_no" placeholder="******-*******">
 				</td>
 			</tr>
 			<tr>
 				<td>연령</td>
 				<td>
-					<input type="text" id="age" name="age" value="">
+					<input type="text" id="years" name="years" value="">
 				</td>
 				<td>*이메일</td>
 				<td>
-					<input type="text" title="이메일" name="email" id="email" class="necessary" />
-					<select name="email" id="email" class="email">
-						<option value="@naver.com">@naver.com</option>
-						<option value="@nate.com">@nate.com</option>
-						<option value="@google.com">@google.com</option>
-						<option>직접입력</option>
-					</select>
-				</td>
+				<input type="text" title="이메일" name="email_1" id="email_1" class="necessary">
+				<select name="email_2" id="email_2" class="email">
+					<option value="">(선택)</option>
+				</select>
+				<input type="hidden" name="email">
+			</td>
 				<td>성별</td>
 				<td>	
-					<select name="sex" id="sex" >
+					<select name="sex" id="sex">
 						<option value="0">(선택)</option>
 						<option value="1">남자</option>
 						<option value="2">여자</option>
@@ -1189,75 +1029,49 @@
 				<td>입사구분</td>
 			 	<td>
 					<select id="put_yn" name="put_yn">
-
-					  <c:forEach items="${putYn}" var="putYn" varStatus="status">
-					
-					    <option value="${putYn}">${putYn}</option>
-					
-					  </c:forEach>
-
+					  <option value="">(선택)</option>
 					</select>
+					
 				</td>
 				<td>직위</td>
 				<td>
-					<select name="pos_gbn_code" id="pos_gbn_code" value="1">
-						<option value="0">(사원)</option>
-						<option value="1">(대리)</option>
-						<option value="2">(과장)</option>
-						<option value="3">(차장)</option>
-						<option value="4">(부장)</option>
-						<option value="5">(사장)</option>
+					<select id="pos_gbn_code" name="pos_gbn_code">
+					    <option value="">(선택)</option>
 					</select>
 				</td>
 				<td>부서</td>
 				<td>
-					<select name="dept_code" id="dept_code" value="1">
-						<option value="0">(영업부)</option>
-						<option value="1">(홍보부)</option>
-						<option value="2">(재무부)</option>
-						<option value="3">(생산부)</option>
+					<select id="dept_code" name="dept_code">
+					     <option value="">(선택)</option>
 					</select>
 				</td>
 				<td>직종</td>
 				<td>
-					<select name="join_gbn_code" value="2">
-						<option value="0">(SI)</option>
-						<option value="1">(유지보수)</option>
-						<option value="2">(솔루션)</option>
-						<option value="3">(개발)</option>
+					<select id="join_gbn_code" name="join_gbn_code">
+					     <option value="">(선택)</option>
 					</select>
 				</td>
 				<td>연봉</td>
 				<td>
-					<input type="text" name="salary" id="salary" placeholder="(만원)" 
-						onkeydown='return onlyNumber(event)' 
-						onkeyup='removeChar(event), inputNumberFormat(this)'>
-					<input type="hidden" name="salary" id="salary" >
-				</td>
+				<input type="text" name="salaryShow" id="salaryShow" placeholder="(만원)" onkeydown="return onlyNumber(event)" onkeyup="removeChar(event), inputNumberFormat(this)" style="text-align: right;">
+				<input type="hidden" name="salary" id="salary">
+			</td>
 			</tr>
 			<tr>
-				<td>군필여부
-						<select name="mil_yn" id="mil_yn">
-						<option value="0" >미필</option>
-						<option value="1" >군필</option>	
+				<td>군필여부</td>
+				<td>
+					<select id="mil_yn" name="mil_yn">
+					  <option value="">(선택)</option>
 					</select>
 				</td>
 				<td class="mil">군별</td>
 				<td class="mil">
-					<select name="mil_type"  class="mil" value="1">
-						<option value="0">(육군)</option>
-						<option value="1">(공군)</option>
-						<option value="2">(해군)</option>
-						<option value="3">(해병대)</option>
+					<select id="mil_type" name="mil_type">
+					  <option value="">(선택)</option>
 					</select>
 					계급
-					<select name="mil_level" class="mil" value="4" >
-						<option value="0">(이병)</option>
-						<option value="1">(일병)</option>
-						<option value="2">(상병)</option>
-						<option value="3">(병장)</option>
-						<option value="4">(하사)</option>
-						<option value="5">(장교)</option>
+					<select id="mil_level" name="mil_level">
+					  <option value="">(선택)</option>
 					</select>
 				</td>
 				<td class="mil">입영일자</td>
@@ -1272,23 +1086,14 @@
 			<tr>
 				<td>
 					KOSA등록
-					<select name="kosa_reg_yn" value="1" >
-						<option value="0">등록</option>
-						<option value="1">미등록</option>
+					<select id="kosa_reg_yn" name="kosa_reg_yn">
+					  <option value="">(선택)</option>
 					</select>
 				</td>
+				<td>KOSA등급</td>
 				<td>
-					KOSA등급
-				</td>
-				<td>
-					<select name="kosa_class_code" value="1">
-						<option value="0">(초급기능사)</option>
-						<option value="1">(중급기능사)</option>
-						<option value="2">(고급기능사)</option>
-						<option value="3">(초급기술자)</option>
-						<option value="4">(중급기술자)</option>
-						<option value="5">(고급기술자)</option>
-						<option value="6">(특급기술자)</option>
+					<select id="kosa_class_code" name="kosa_class_code">
+					  <option value="">(선택)</option>
 					</select>
 				</td>
 				<td>*입사일자</td>
@@ -1309,43 +1114,39 @@
 				</td>
 				<td>등급</td>
 				<td>
-					<select name="gart_level" >
-						<option value="0">(초급)</option>
-						<option value="1">(중급)</option>
-						<option value="2">(고급)</option>
+					<select id="gart_level" name="gart_level">
+					  <option value="">(선택)</option>
 					</select>
 				</td>
 				<td>입사여부</td>
 				<td>
-					<select name="join_type" value="0">
-						<option value="0">(근무중)</option>
-						<option value="1">(퇴사)</option>
+					<select id="join_type" name="join_type">
+					  <option value="">(선택)</option>
 					</select>
 				</td>
 				<td>
 					사업자번호
 				</td>
 				<td>
-					<input type="text" name="cmp_reg_no" id="cmp_reg_no" value="" cols="20"
-							onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)'>
+					<input type="text" name="cmp_reg_no" id="cmp_reg_no" value="" cols="20" onkeydown="return onlyNumber(event)" onkeyup="removeChar(event)">
 				</td>
 				<td>
 					사업자등록증
 				</td>
 				<td>
-					<input type="file" name="cmp_reg" id="cmp_reg" accept=".bmp, .gif, .jpg, .png" style="display:none;"> <!-- accept=".bmp, .gif, .jpg, .png" style="display:none;"  -->
-					<label for="cmp_reg" id="cmp_reg_imagefile_lbl" 
-								style="border: 2px dotted black; border-radius: 5px; padding: 2px;">파일업로드</label>
-					<input type="hidden" name="cmp_reg_image" id="cmp_reg_image" >	 
+					<input type="text" name="cmp_reg" id="cmp_reg"> <!-- accept=".bmp, .gif, .jpg, .png" style="display:none;"  -->
+					<!-- <label for="cmp_reg" id="cmp_reg_imagefile_lbl" 
+								style="border: 2px dotted black; border-radius: 5px; padding: 2px;">파일업로드</label> -->
+					<input type="hidden" name="cmp_reg_image" id="cmp_reg_image">	 
 				</td>
-				<td>
+				<!-- <td>
 					<input type="button" name="preview_cmp_reg" class="preview" value="미리보기" onclick="showImgWin(cmp_reg_imagefile.value)">
-				</td>
+				</td> -->
 			</tr>
 			<tr>
 				<td>
 					자기소개
-				<td colspan="3">
+				</td><td colspan="3">
 					<textarea name="self_intro" id="self_intro" cols="60" placeholder="100자 내외로 적으시오"></textarea>
 				</td>
 				
@@ -1353,16 +1154,17 @@
 					이력서
 				</td>
 				<td>
-					<input type="file" name="carrier" id="carrier" accept=".pdf" style="display:none;"> <!--  accept=".pdf" style="display:none;" -->
-					<label for="carrier" id="carrier_image_lbl" 
-							style="border: 2px dotted black; border-radius: 5px; padding: 2px;">파일업로드</label>
-					<input type="hidden" name="carrier_image" id="carrier_image" >
+					<input type="text" name="carrier" id="carrier"> <!--  accept=".pdf" style="display:none;" -->
+					<!-- <label for="carrier" id="carrier_image_lbl" 
+							style="border: 2px dotted black; border-radius: 5px; padding: 2px;">파일업로드</label> -->
+					<input type="hidden" name="carrier_image" id="carrier_image">
 				</td>
-				<td>
+				<!-- <td>
 					<input type="button" name="preview_cmp_reg" class="preview" value="미리보기" onclick="showImgWin(cmp_reg_imagefile.value)">
-				</td>
+				</td> -->
 			</tr>
 		</table>
 	</form>
-</body>
+</body></head>
+
 </html>

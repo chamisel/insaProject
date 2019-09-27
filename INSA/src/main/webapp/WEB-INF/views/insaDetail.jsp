@@ -6,84 +6,360 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>수정 페이지</title>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
-
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-
-<script type="text/javascript">
-
-	$(document).ready(function (){
-		
-		loadCommonCode();
-		
-
-	
-		$('#delete').click(function(){
-			 var theSabun = $('#sabun').val();
-			form 동적 생성
-			var form = document.createElement("form");
-		  	form.setAttribute("charset", "UTF-8");
-		    form.setAttribute("method", "Post");  //Post 방식
-		    form.setAttribute("action", "del"); //요청 보낼 주소
-	
-		    var hiddenField = document.createElement("input");
-		    hiddenField.setAttribute("type", "hidden");
-		    hiddenField.setAttribute("name", "pickSabun");
-		    hiddenField.setAttribute("value", theSabun);
-		    form.appendChild(hiddenField);
-		         
-		    document.body.appendChild(form);
-		    form.submit();
-			alert("사번 "+$('#sabun').val()+" 삭제하겠습니다.."); 
-			var thisForm = document.modi_Form;
-			thisForm.method="post";
-			thisForm.action="del";
-			thisForm.submit();
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		console.log("다큐준비");
+	});
+		$(document).ready(function onload(){		//처음 로딩시 실행
+//			var flag_onload = false;
+			console.log("onload()실행");
+			loadCommonCode();
 			
-		});
+
+			$('#delete').click(function(){
+				/* var pickSabun = $('#sabun').val();
+				//form 동적 생성
+				var form = document.createElement("form");
+			  	form.setAttribute("charset", "UTF-8");
+			    form.setAttribute("method", "Post");  //Post 방식
+			    form.setAttribute("action", "del"); //요청 보낼 주소
 		
-		$('#forward').click(function(){
-			location.href="/";
-		});
+			    var hiddenField = document.createElement("input");
+			    hiddenField.setAttribute("type", "hidden");
+			    hiddenField.setAttribute("name", "pickSabun");
+			    form.appendChild(hiddenField);
+			         
+			    document.body.appendChild(form);
+			    form.submit(); */
+				alert("사번 "+$('#sabun').val()+" 삭제하겠습니다.."); 
+				var thisForm = document.modiForm;
+				thisForm.method="post";
+				thisForm.action="del";
+				thisForm.submit();
+				
+			});
+			$('#update').click(function(){
+	   			console.log("업데이트 실행");
+	   			var flag=true;
+				var strNames="";
+				var flagForFirstFocus=true;
+				$('.necessary').each(function(index, item) {				//필수항목들 확인( each() 반복문 )
+					if(item.value!=null && item.value!="" ){	//만약 만족한다면 넘어간다.
+					}else{														//아니면 flag=false를 통해 ajax실행x 
+						flag=false;
+						if(flagForFirstFocus){
+							item.focus();
+							flagForFirstFocus=false;								
+						}
+						strNames+=" * "+item.title+"\n";
+					}
+				});
+				console.log("necessary클래스 미입력\n"+strNames);
+				console.log("비번재입력확인 : "+document.modiForm.passwordCheck.value);
+				if(flag && $("#passwordCheck").val()){
+					console.log("수정::: ajax 실행한다.");
+	 				$.ajax({
+						headers: { 
+							 'Accept': 'application/json',
+						     'Content-Type': 'application/json' 
+					    },
+		 				url:"update",
+						type:"post",
+//						dataType : 'json',
+						data:JSON.stringify($('#modiForm').serializeObject()), //$('#inputForm').serializeObject()),
+						contentType: 'application/json;charset=UTF-8' ,
+
+//						traditional:true,
+							
+					        //Ajax 성공시
+						success : function(data){
+							alert("수정성공");
+							console.log("수정성공", data);
+							return;
+					        //Ajax 실패시
+					    },error : function(status, error,request, data){
+					    	console.log("수정실패\n"+status+"\n"+error+"\n"+request.responseText+"\n"+request.status+"\n////////");
+					    	console.log($('#modiForm').serializeObject());
+					    	console.log(objToJson($('#modiForm').serializeArray()));
+					    	console.log($('#modiForm').serializeArray());
+					    }
+						
+					});
+				}else{
+					alert("***********필수항목 미입력***********\n"+strNames+"\n+++++++++++필수값을 입력해주세요.+++++++++++");
+				}
+			});
+			$('#forward').click(function(){
+				location.href="/getAll";
+			});
+
+			
+				//이름칸 한글만 입력 가능
+		 	$("#name").keyup(function(event){
+				  regexp = /[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"'\\]/g;
+				  v = $(this).val();
+				  if( regexp.test(v) ) {
+				   alert("한글만입력하세요");
+				   $(this).val(v.replace(regexp,''));
+				  }
+			 });
+				
+				//영문성명칸 영문만 입력 가능
+		 	$("#eng_name").keyup(function(event){
+		 		if (!(event.keyCode >=37 && event.keyCode<=40)) {
+		 			var inputVal = $(this).val();
+		 			$(this).val(inputVal.replace(/[^a-z]/gi,''));
+	 			}
+			});
+			
+			//재확인 비밀번호
+			$("#pwd").focus(function(){
+				$("#pwd").val("");
+				$("#repwd").attr("disabled", false);
+				$("#passwordCheck.value").val(false);
+				
+			});
+		     
+				//입사퇴사++++++++++++++++++++++++++++++++++++++++++
+				$('#retire_day').change(function(){
+					if($('#retire_day').val().trim()==""){
+						$('#join_gbn_code').val(1);		//입사중
+					}else{
+						$('#join_gbn_code').val(0);		//퇴사중
+					}
+				});
+			
+				//비밀번호 확인++++++++++++++++++++++++++++++++++++++
+				$("#repwd").blur(function(){
+					var password = document.modiForm.pwd.value;
+					var repass = document.modiForm.repwd.value;
+					if(password != repass){
+						alert("비밀번호를 똑같이 입력해주세요");
+						document.modiForm.passwordCheck.value="false";
+						repass="";
+					}else{
+						document.modiForm.passwordCheck.value="true";
+					}
+				});
+				
+				//이메일주소 만들기
+				$('#email_1, #email_2').change(function(){
+					var email = $('#email_1').val() + $('#email_2').val();
+					$('#email').val(email);
+				});
+				
+				
+/* 				//군관련 보이기++++++++++++++++++++++++++++++
+				
+				$("#mil_yn").change(function(){
+					var milYN = $(this).val();
+					if(milYN==1){
+						$(".mil").show();
+//						$("#mil_startdate").show();
+//						$("#mil_enddate").show();
+					} else{
+						$(".mil").hide();
+//						$("#mil_startdate").hide();
+//						$("#mil_enddate").hide();
+					}
+				});
+				 */
+				//주민번호 확인+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				$("#reg_no").off().on('keyup',function (e) {
+					if(e.keyCode==8||e.keyCode==39||e.keyCode==37){
+						return false;
+					}
+				        $("#reg_no").val($("#reg_no").val().replace(/[^0-9]/g,""));
+//				        $("#reg_no").checkNum($("#reg_no"), e);
+			    	});
+					
+				$("#reg_no").change(function(){
+					var jumin = $("#reg_no");
+					var flag_reg_no = false;
+					
+					if(jumin.val().length!=13 ) {
+				   			flag_reg_no=true;
+				   			alert("13자리 아님");
+					}else{
+						var yearsCheck = jumin.val().substring(0,2);
+						var genderCheck = jumin.val().substring(6,7);
+			   			if(genderCheck=="1" || genderCheck=="2"){
+					        //"-" 넣기
+			   				var str1 = jumin.val().substring(0,6);
+					        var str2 = jumin.val().substring(6,jumin.val().length);
+					        $("#reg_no").val(str1+'-'+str2);
+					       //성별 계산
+					        if(genderCheck=="1"){
+					        	$("#sex").val("1");
+					        }else{
+					        	$("#sex").val("2");
+					        }
+					       //나이계산 
+					        var birthday = new Date(yearsCheck);
+					        var today = new Date(); 
+					        var years = today.getFullYear() - birthday.getFullYear();
+					        $("#years").val(years+1);
+
+					        flag_reg_no=false;
+			   			}else{
+			   				
+			   				flag_reg_no=true;
+			   			}
+			   		}
+					if(flag_reg_no){
+						alert("주민등록번호를 정확히 입력해주세요");
+			   			$("#reg_no").val("");
+			   			$("#reg_no").focus();
+			   			flag_reg_no=false;
+					}
+				});
+				//새로 포커스가 올 경우 모두 지우기
+				$("#reg_no").focus(function(){
+					$("#reg_no").val("");
+					$("#years").val("");
+					$("#sex").val("0");
+				});
+				
+				
+				/* //파일 저장+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+				$('#pic_file, #cmp_reg, #resume').change(function() {
+			        var formData = new FormData($("#modiForm")[0]);
+			        formData.append("fileUploadFor",$(this).attr("name"));
+			        
+			        console.log($(this).attr("name"));
+			        
+			        $.ajax({
+			            type : 'post',
+			            url : 'filesave',
+//			            url : 'filesaveToDB',
+			            data : formData,
+			            processData : false,
+			            contentType : false,
+			            
+			            success : function(data) {
+			                alert("파일을 업로드하였습니다.");
+			                console.log("업로드한 파일 이름 : "+data);
+			                pathSaving(data);
+			               	return data;
+			            },
+			            error : function(data,error) {
+			                alert("파일 업로드에 실패하였습니다.");
+			                alert(data);
+			                console.log(error);
+			                console.log(error.status);
+			                return;
+			            }
+		            });
+		        });
+				
+				 */
+				$('#phone').change(function(){
+					if($('#phone').val()==formatPhone($('#phone').val())){
+						alert("전화번호 오류");
+						$('#phone').val("");
+						$('#phone').focus();
+					}else{
+						$('#phone').val(formatPhone($('#phone').val()));
+					}
+				});
+				$('#hp').change(function(){
+					if($('#hp').val()==formatMobile($('#hp').val())){
+						alert("핸드폰번호 오류");
+						$('#hp').val("");
+						$('#hp').focus();
+					}else{
+						$('#hp').val(formatMobile($('#hp').val()));
+					}
+				});
+				
+
+				
+				$('#salaryShow').blur(function(){
+					console.log("변경전 콤마값 ::::::::"+$('#salaryShow').val());
+					$('#salary').val(uncomma($('#salaryShow').val()))
+					console.log("변경후 숫자값:::::::"+$('#salary').val());
+				});
+			    
+				
+				$('#cmp_reg_no').blur(function(){
+					var cmp_reg_no = $('#cmp_reg_no').val();
+					if(cmp_reg_no.length!=10){
+						alert("사업자번호를 잘못입력하였습니다.");
+						$('#cmp_reg_no').val("");
+					}else if(cmp_reg_no!="" && cmp_reg_no!=null){
+						$('#cmp_reg_no').val(company_registration_number(cmp_reg_no));
+					}
+					
+				});
+				
+		/* 		$('#join_day').blur(function(){
+					var date= $('#join_day').val();
+					var first = date.indexOf("-");
+					var second = date.indexOf(first+1, "-");
+					alert("first : "+first+"second::"+second);
+					if(first==4 && second==7){
+						alert("맞는데");
+					}else{
+						 if(date.lenght!=8){
+							alert("날짜를 올바른 형식으로 입력해주세요\n***YYYY-MM-DD***")
+						}else if(date!=null && date!=""){
+							$('#join_day').val(calendar_format(date));
+						}
+						
+					}
+				}); */
+			
+
+				
+			
+			/* 	<c:set var="theMember" value="${theMember}" />
+			<c:choose>
+				<c:when test="${theMember != null}">
+					flag_onload=true;			
+					document.modiForm.sabun.value=${theMember.sabun};
+					document.modiForm.name.value=${theMember.name};
+					document.modiForm.eng_name.value=${theMember.eng_name};
+				
+				
+				//값 넣기//////////////////////////////////////////////
+	 			$.ajax({
+			      type: "POST",
+			      contentType : 'application/json; charset=utf-8',
+			      dataType : 'json',
+			      url: "/loadCommonCode",
+			      data: JSON.stringify(search), // Note it is important
+			      success :function(result) {
+			       // do what ever you want with data
+			     }
+			  	
+
+
+				</c:when>
+				<c:otherwise>
+					alert("새아이:"+"${newSabun}");
+					document.modiForm.sabun.value="${newSabun}";
+				</c:otherwise>
+				
+			</c:choose>
+			});
+
+			if(flag_onload){
+				var theMember = "<c:out value='${theMember}' />"
+				$('#sabun').val(theMember.getSabun());
+				$('#name').val(theMember.getName());
+			} 
+		*/
+		}); 
+	//////////////////////////////////////DOCUMENT.READY///////////////////////////////////////////////////	
 		
-		//input을 datepicker로 선언
-        $("#join_day, #retire_day, .datepicker").datepicker({
-            dateFormat: 'yy-mm-dd' //Input Display Format 변경
-            ,showOtherMonths: true //빈 공간에 현재월의 앞뒤월의 날짜를 표시
-            ,showMonthAfterYear:true //년도 먼저 나오고, 뒤에 월 표시
-            ,changeYear: true //콤보박스에서 년 선택 가능
-            ,changeMonth: true //콤보박스에서 월 선택 가능                
-            ,showOn: "both" //button:버튼을 표시하고,버튼을 눌러야만 달력 표시 ^ both:버튼을 표시하고,버튼을 누르거나 input을 클릭하면 달력 표시  
-            ,buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif" //버튼 이미지 경로
-            ,buttonImageOnly: true //기본 버튼의 회색 부분을 없애고, 이미지만 보이게 함
-            ,buttonText: "선택" //버튼에 마우스 갖다 댔을 때 표시되는 텍스트                
-            ,yearSuffix: "년" //달력의 년도 부분 뒤에 붙는 텍스트
-            ,monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'] //달력의 월 부분 텍스트
-            ,monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'] //달력의 월 부분 Tooltip 텍스트
-            ,dayNamesMin: ['일','월','화','수','목','금','토'] //달력의 요일 부분 텍스트
-            ,dayNames: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'] //달력의 요일 부분 Tooltip 텍스트
-//            ,minDate: "-1M" //최소 선택일자(-1D:하루전, -1M:한달전, -1Y:일년전)
-//            ,maxDate: "+1M" //최대 선택일자(+1D:하루후, -1M:한달후, -1Y:일년후)                
-        });                    
-        
-        //초기값을 오늘 날짜로 설정
-        $("#join_day, #retire_day, .datepicker").datepicker(); //(-1D:하루전, -1M:한달전, -1Y:일년전), (+1D:하루후, -1M:한달후, -1Y:일년후)            
-  		
-      
-   		$("#join_day").change(function(){
-   			 if($("#join_day").val().trim()==""){
-   				 $("#retire_day").attr("disabled", true);
-   			 }else{
-   				 $("#retire_day").attr("disabled",false);
-   			 }
-   		 });
-        
-   		$('#update').click(function(){
-   			console.log("업데이트 실행");
-   			var flag=true;
+		function update(){
+			console.log("업데이트 실행");
+			var flag=true;
 			var strNames="";
 			var flagForFirstFocus=true;
 			$('.necessary').each(function(index, item) {				//필수항목들 확인( each() 반복문 )
@@ -98,21 +374,23 @@
 				}
 			});
 			console.log("necessary클래스 미입력\n"+strNames);
-			console.log("비번재입력확인 : "+document.modi_Form.passwordCheck.value);
+			console.log("비번재입력확인 : "+document.modiForm.passwordCheck.value);
+			console.log("비번재입력확인 : "+$("#passwordCheck").val());
+			console.log("flag : "+flag);
 			if(flag && $("#passwordCheck").val()){
 				console.log("수정::: ajax 실행한다.");
- 				$.ajax({
-				headers: {
+					$.ajax({
+					headers: { 
 						 'Accept': 'application/json',
 					     'Content-Type': 'application/json' 
 				    },
 	 				url:"update",
 					type:"post",
-					dataType : 'json',
-					data:JSON.stringify($('#modi_Form').serializeObject()), //$('#inputForm').serializeObject()),
+//					dataType : 'json',
+					data:JSON.stringify($('#modiForm').serializeObject()), //$('#modiForm').serializeObject()),
 					contentType: 'application/json;charset=UTF-8' ,
 
-					traditional:true,
+//					traditional:true,
 						
 				        //Ajax 성공시
 					success : function(data){
@@ -122,423 +400,307 @@
 				        //Ajax 실패시
 				    },error : function(status, error,request, data){
 				    	console.log("수정실패\n"+status+"\n"+error+"\n"+request.responseText+"\n"+request.status+"\n////////");
-				    	console.log($('#modi_Form').serializeObject());
-				    	console.log(objToJson($('#modi_Form').serializeArray()));
-				    	console.log($('#modi_Form').serializeArray());
+				    	console.log($('#modiForm').serializeObject());
+				    	console.log(objToJson($('#modiForm').serializeArray()));
+				    	console.log($('#modiForm').serializeArray());
 				    }
 					
 				});
 			}else{
 				alert("***********필수항목 미입력***********\n"+strNames+"\n+++++++++++필수값을 입력해주세요.+++++++++++");
 			}
-		});
+		} 
+		//주소 api
+		function sample6_execDaumPostcode() {
+	        new daum.Postcode({
+	            oncomplete: function(data) {
+	                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
 
-   			//업데이트
-	   		$('#update').click(function(){
-			console.log("업데이트 클릭");
-			
-			alert("업데이트 클릭");
-			var flag=true;
-			$('.necessary').each(function(index) {
-				if(($(this).val()!=null && $(this).val()!="" )&& flag){
-				}else{
-					flag=false;
-					alert("false");
-				}
-			
+	                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+	                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+	                var addr = ''; // 주소 변수
+	                var extraAddr = ''; // 참고항목 변수
+
+	                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+	                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+	                    addr = data.roadAddress;
+	                } else { // 사용자가 지번 주소를 선택했을 경우(J)
+	                    addr = data.jibunAddress;
+	                }
+
+	                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+	                if(data.userSelectedType === 'R'){
+	                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+	                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+	                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+	                        extraAddr += data.bname;
+	                    }
+	                    // 건물명이 있고, 공동주택일 경우 추가한다.
+	                    if(data.buildingName !== '' && data.apartment === 'Y'){
+	                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+	                    }
+	                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+	                    if(extraAddr !== ''){
+	                        extraAddr = ' (' + extraAddr + ')';
+	                    }
+	                    // 조합된 참고항목을 해당 필드에 넣는다.
+	                    document.getElementById("sample6_extraAddress").value = extraAddr;
+	                
+	                } else {
+	                    document.getElementById("sample6_extraAddress").value = '';
+	                }
+
+	                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+	                document.getElementById('zip').value = data.zonecode;
+	                document.getElementById("addr1").value = addr;
+	                // 커서를 상세주소 필드로 이동한다.
+	                document.getElementById("addr2").focus();
+	            }
+	        }).open();
+	    }
+		//파일경로값 저장
+		function pathSaving(data){
+			if(data.indexOf("pic")>0){
+				$('#pic_file_name').val(data);
+			}else if(data.indexOf("resume")>0){
+				$('#resume_file').val(data);
+				showFileName($('#resume_file_lbl'), data);
+			}else{
+				$('#cmp_reg_imagefile').val(data);
+				showFileName($('#cmp_reg_imagefile_lbl'), data);
+			}
+		}
+		function showFileName(obj, path){
+			console.log("showFileName / obj.id:::"+obj.attr("id"));
+			var fileName = path.substring(path.lastIndexOf("/")+1);
+			console.log("showFileName:::"+fileName);
+			obj.text(fileName);
+		}
+		
+		//json타입으로 바꾸기1
+		jQuery.fn.serializeObject = function() {
+			var obj = null;
+			try {
+				if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
+					console.log("serializeObject 실행");
+					var arr = this.serializeArray();
+					console.log(arr);
+					if(arr){ 
+						obj = {};
+						jQuery.each(arr, function() {
+							obj[this.name] = this.value; 
+						}); 
+					} 
+				} 
+			}catch(e) {
+				alert(e.message);
+			}finally { } 
+			return obj;
+			conlole.log(obj);
+		}
+		//json타입으로 바꾸기2++++++++++++++++++++++++++++++++++++++++++++++++++확인하기
+		function objToJson(formData){
+			var data = formData;
+			conlole.log(data);
+			var obj = {};
+			$.each(data, function(idx, ele){
+			obj[ele.name] = ele.value;
 			});
-			
-			if(flag){
-				var formObj = document.modi_Form;
-				formObj.action="update";
+			return obj;
+		}
+		
+		//사진 미리보기
+		function getThumbnailPrivew(input, targetId) {
+		    if (input.files && input.files[0]) {
+		        var reader = new FileReader();
+		        reader.onload = function (e) {
+		            var element = windowcument.getElementById(targetId);
+		            element.setAttribute("src", e.target.result);
+		        }
+		        reader.readAsDataURL(input.files[0]);
+		    }
+		}
+
+		 
+		
+		
+	/*	
+	 	function save(){
+				var formObj = document.getElementById("modiForm");
+				formObj.action="input";
 				formObj.method="post";
 				formObj.submit();
+
+		}
+		
+	*/	
+
+		//날짜 확인+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		function compareDate(){
+			var thisDate = arguments[0].value;		
+			var compare = arguments[1];
+			compare_date = document.getElementById(compare).value;
+			if(compare_date==""){
+				var msg_compareDate;
+				if(compare=="join_day"){
+					msg_compareDate="입사일";
+				}else{
+					msg_compareDate="입영일자";
+				}
+				alert(msg_compareDate+"을(를) 먼저 입력해주세요.");
+				compare_date="";	
 			}else{
-				alert("필수값을 입력해주세요.");
+				if(compare_date > thisDate){
+					window.alert('일자를 확인해주세요.');
+					document.getElementById(arguments[0].id).value='';
+				}
 			}
-		}); 
-	
-	
-		//퇴사일 입력시, 퇴사처리
-		$('#retire_day').change(function(){
-			console.log("retire_day 변경");
-			if($('#retire_day').val().trim()==""){
-				$('#join_gbn_code').val(1);		//입사중
-				console.log("retire_day 변경 :::: 입사중");
-			}else{
-				$('#join_gbn_code').val(0);		//퇴사중
-				console.log("retire_day 변경 :::: 퇴사");
+		}
+		
+		//숫자만 들어오기
+		function onlyNumber(event){
+		    event = event || window.event;
+		    var keyID = (event.which) ? event.which : event.keyCode;
+		    if ( (keyID >= 48 && keyID <= 57) || (keyID >= 96 && keyID <= 105) || keyID == 8 || keyID == 46 || keyID == 37 || keyID == 39 ) 
+		        return;
+		    else
+		        return false;
+		}
+		function removeChar(event) {
+		    event = event || window.event;
+		    var keyID = (event.which) ? event.which : event.keyCode;
+		    if ( keyID == 8 || keyID == 46 || keyID == 37 || keyID == 39 ) 
+		        return;
+		    else
+		        event.target.value = event.target.value.replace(/[^0-9]/g, "");
+		}
+		
+		
+		// ---------------------------미리보기 이미지 팝업창 ------------------------
+		function go(img){
+		   var img,x,y,x1,y1
+		      if (img.length < 1) {
+		            alert(" 이미지 파일이 선택되지 않았거나 \n\n 잘못된 파일이름 입니다 ")
+		            document.registform.attachFile.focus();
+		            return false;
+		   } 
+		   aa=LoadImg(img);
+		   x= aa.wd;
+		   y= aa.ht;
+		          x1=500;
+		          y1=400; 
+		       if (x<x1) { 
+		          x1=x;
+		       }
+		       if (y<y1) {
+		          y1=y;
+		       }
+		    window.open('pop.htm?'+img,'','width='+x1+',height='+y1+',top=100,left=100,scrollbars=1,resizable=1');  
+		}
+		//------------------로딩 이미지 크기 알아냄----------------
+		function LoadImg(img) {
+		 var d=new Object();
+		    var imgInfo = new Image(); //이미지 객체를 생성하고
+		    imgInfo.src = img; //이미지 주소를 대입한후에,
+		 d.wd=imgInfo.width; //이미지의 너비와
+		 d.ht=imgInfo.height; //높이를 구한뒤
+		 return d; //값을 반환
+		}
+		
+		
+		
+		var imgObj = new Image();
+		function showImgWin(imgName) {
+			imgObj.src = "resources/image/"+imgName;
+			setTimeout("createImgWin(imgObj)", 100);
+		}
+		function createImgWin(imgObj) {
+			if (! imgObj.complete) {
+				setTimeout("createImgWin(imgObj)", 100);
+				return;
 			}
-		});
+			imageWin = window.open("", "imageWin",
+			"width=" + imgObj.width + ",height=" + imgObj.height);
+			imageWincument.write("<html><body style='margin:0'>") ;
+			imageWincument.write("<img src=\'" + imgObj.src + "\'>") ;
+			imageWincument.write("</body><html>") ;
+			imageWincument.title = "resources/image/"+imgObj.src;
+		}
 		
-		//비밀번호 수정
-		$("#pwd").focus(function(){
-			$("#pwd").val("");
-			$("#repwd").attr("disabled", false);
-			$("#passwordCheck.value").val(false);
-		});
-		$("#pwd").blur(function(){
-			$("#repwd").focus();
-		});
-		//비밀번호 확인
-		$("#repwd").blur(function(){
-			var password = $("#pwd").val();
-			var repass = $("#repwd").val();
-			if(password != repass){
-				alert("비밀번호를 다시 입력해주세요");
-				$("#passwordCheck.value").val(false);
-				repass="";
-			}else{
-				$("#passwordCheck.value").val(true);;
-			}
-		});
-		
-		//이메일주소 만들기
-			$('#email_1, #email_2').change(function(){
-				var email = $('#email_1').val() + $('#email_2').val();
-				$('#email').val(email);
-			});
+		function showPDF(pdfFile){
+			window.open("resources/image/"+pdfFile, '_blank', 'fullscreen=yes');
+	}	
 		
 		
-		$("#mil_yn").change(function(){
-			var milYN = $(this).val();
-			if(milYN==1){
-				$(".mil").show();
-				$("#mil_startdate").show();
-				$("#mil_enddate").show();
-			} else{
-				$(".mil").hide();
-				$("#mil_startdate").hide();
-				$("#mil_enddate").hide();
-			}
+	 		
+		
+	/* 	$(document).ready(function(){
 		});
 		
-		$('#phone').change(function(){
-			if($('#phone').val()==formatPhone($('#phone').val())){
-				alert("올바른 전화번호를 넣어주세요");
-				$('#phone').val("");
-				$('#phone').focus();
-			}else{
-				$('#phone').val(formatPhone($('#phone').val()));
-			}
-		});
-		$('#hp').change(function(){
-			if($('#hp').val()==formatMobile($('#hp').val())){
-				alert("올바른 핸드폰번호를 넣어주세요");
-				$('#hp').val("");
-				$('#hp').focus();
-			}else{
-				$('#hp').val(formatMobile($('#hp').val()));
-			}
-		});
-		
-		
-		/* $('#zip').click(function(){
-			goPopup();
+		$("#" + id).bind("keyup", function(event) {
+		    var regNumber = /^[0-9]*$/;
+		    var temp = $("#" + id).val();
+		    if(!regNumber.test(temp))
+		    {
+		        console.log('숫자만 입력하세요');
+		        $("#"+id).val(temp.replace(/[^0-9]/g,""));
+		    }
 		}); */
 		
 		
-		//파일 저장+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		$('#profile_image, #cmp_reg, #carrier').change(function() {
-	        var formData = new FormData($("#modi_Form")[0]);
-	        formData.append("fileUploadFor",$(this).attr("name"));
-	        
-	        console.log($(this).attr("name"));
-	        
-	        $.ajax({
-	            type : 'post',
-	            url : 'filesave',
-	            data : formData,
-	            processData : false,
-	            contentType : false,
-	            
-	            success : function(data) {
-	                alert("파일을 업로드하였습니다.");
-	                console.log("업로드한 파일 경로 : "+data);
-	                pathSaving(data);
-	               	return data;
-	            },
-	            error : function(data,error) {
-	                alert("파일 업로드에 실패하였습니다.");
-	                alert(data);
-	                console.log(error);
-	                console.log(error.status);
-	                return;
-	            }
-            });
-        });
-		
-		$('#salaryShow').blur(function(){
-			console.log("변경전 콤마값 ::::::::"+$('#salaryShow').val());
-			$('#salary').val(uncomma($('#salaryShow').val()))
-			console.log("변경후 숫자값:::::::"+$('#salary').val());
-		});
-	
-		$("#id").keyup(function(event){
-			if (!(event.keyCode >=37 && event.keyCode<=40)) {
-			var inputVal = $(this).val();
-			$(this).val(inputVal.replace(/[^a-z0-9]/gi,''));
-			}
-			});
-	});
-});
-	
-
-	
-///////////////////////////////////////+++++document.ready+++++++++/////////////////////////////////////
-	//파일경로값 저장
-	function pathSaving(data){
-		if(data.indexOf("pic")>0){
-			console.log("pathSaving:::profile_image_name:::"+data);
-			$('#profile_image_name').val(data);
-			console.log("pathSaving:::$('#profile_image_name').val():::"+$('#profile_image_name').val());
-		}else if(data.indexOf("carrier")>0){
-			$('#carrier_file').val(data);
-			showFileName($('#carrier_file_lbl'), data);
-		}else{
-			$('#cmp_reg_imagefile').val(data);
-			showFileName($('#cmp_reg_imagefile_lbl'), data);
-		}
-	}
-	function showFileName(obj, path){
-		console.log("showFileName / obj.id:::"+obj.attr("id"));
-		var fileName = path.substring(path.lastIndexOf("/")+1);
-		console.log("showFileName:::"+fileName);
-		obj.text(fileName);
-	}
-	
-	//json타입으로 바꾸기
-	jQuery.fn.serializeObject = function() {
-		var obj = null;
-		try {
-			if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
-				var arr = this.serializeArray();
-				if(arr){ 
-					obj = {};
-					jQuery.each(arr, function() {
-						obj[this.name] = this.value; 
-					}); 
-				} 
-			} 
-		}catch(e) {
-			alert(e.message);
-		}finally { } 
-		return obj;
-	}
-
-	//Object를 json타입으로 변환
-	function objToJson(formData){
-		var data = formData;
-		var obj = {};
-		$.each(data, function(idx, ele){
-		obj[ele.name] = ele.value;
-		});
-		return obj;
-	}
-	
-	function showMember(){
-		$('#profile_image_name').val("${oneMember.profile_image_name}")
-		if("${oneMember.profile_image_name}"==null || "${oneMember.profile_image_name}"==""){
-		}else{
-			$('#picture').attr("src", "resources/image/"+"${oneMember.profile_image_name}")
-		}
-		$('#sabun').val("${oneMember.sabun}");
-		$('#name').val("${oneMember.name}");
-		$('#eng_name').val("${oneMember.eng_name}");
-		$('#id').val("${oneMember.id}");
-		$('#pwd').val("${oneMember.pwd}");
-		$('#phone').val("${oneMember.phone}");
-		$('#hp').val("${oneMember.hp}");
-		$('#reg_no').val("${oneMember.reg_no}");
-		$('#age').val("${oneMember.age}");
-		$('#email').val("${oneMember.email}");
-		//이메일 나눠서 보여주기
-		var email="${oneMember.email}";
-		var email_1=email.substring(0, email.indexOf("@"));
-		$('#email_1').val(email_1);
-		var email_2=email.substring(email.indexOf("@"));
-		var options = document.modi_Form.email_2.options;
-		var flag_options = true;
-		var flag_nothing=true;
-		for(var i=0 ; i<options.length && flag_options ; i++){
-			if(options[i].value==email_2){
-				options[i].selected=true;
-				flag_options=false;
-				flag_nothing=false;
-			}
-			if(flag_nothing){
-				options[options.length-1].selected=true;
-			}
-		}
- 		var emailAddr =["naver","nate","google"];
-		emailAddr.forEach(function (item,index) {
-			if(email.indexOf(item)>-1){
-				$('#email_2').val(index);
-			}else{
-				$('#email_2').val("");
-				$('#email_1').val("@"+email+"com");
-			}
-		
-		}); 
-		
-		$('#sex').val("${oneMember.sex}");
-		$('#zip').val("${oneMember.zip}");
-		$('#addr1').val("${oneMember.addr1}");
-		$('#addr2').val("${oneMember.addr2}");
-		$('#pos_gbn_code').val("${oneMember.pos_gbn_code}");
-		$('#dept_code').val("${oneMember.dept_code}");
-		
-		$('#salary').val("${oneMember.salary}");
-		$('#salaryShow').val("${oneMember.salary}");
-		inputNumberFormat(document.modi_Form.salaryShow);
-		
-		$('#mil_yn').val("${oneMember.mil_yn}");
-		if($('#mil_yn').val()==0){
-			$(".mil").hide();
-		}
-		$('#mil_type').val("${oneMember.mil_type}");
-		$('#mil_level').val("${oneMember.mil_level}");
-		$('#mil_startdate').val("${oneMember.mil_startdate}");
-		$('#mil_enddate').val("${oneMember.mil_enddate}");
-		$('#kosa_reg_yn').val("${oneMember.kosa_reg_yn}");
-		$('#kosa_class_code').val("${oneMember.kosa_class_code}");
-		$('#kosa_class_code').val("${oneMember.kosa_class_code}");
-		$('#join_day').val("${oneMember.join_day}");
-		$('#retire_day').val("${oneMember.retire_day}");
-		$('#join_gbn_code').val("${oneMember.join_gbn_code}");
-		
-		$('#cmp_name').val("${oneMember.cmp_name}");
-		$('#cmp_reg_no').val("${oneMember.cmp_reg_no}");
-		
-		$('#cmp_reg_imagefile').val("${oneMember.cmp_reg_imagefile}");
-		if("${oneMember.cmp_reg_imagefile}"!=null&& "${oneMember.cmp_reg_imagefile}"!=""){
-			var fileName = "${oneMember.cmp_reg_imagefile}".substring(path.lastIndexOf("/")+1);
-			console.log("=======:::"+fileName);
-			$('#cmp_reg_imagefile_lbl').text("${oneMember.cmp_reg_imagefile}".substring(path.lastIndexOf("/")+1));
-			showFileName($('#cmp_reg_imagefile_lbl'), "${oneMember.cmp_reg_imagefile}")
-		}else{
-			$('#cmp_reg_imagefile_lbl').text("파일업로드");
-		}
-		
-		$('#self_intro').val("${oneMember.self_intro}");
-		
-		$('#carrier_file').val("${oneMember.carrier_file}");
-		if("${oneMember.carrier_file}"!=null && "${oneMember.carrier_file}"!=""){
-			showFileName($('#carrier_file_lbl'), "${oneMember.carrier_file}")
-		}else{
-			$('#carrier_file_lbl').text("파일업로드");
-		}
-		
-		$('#put_yn').val("${oneMember.put_yn}");
-		
-	}
-		
-		
-		
-		
-	
-	
-	//숫자만 들어오기
-	function onlyNumber(event){
-	    event = event || window.event;
-	    var keyID = (event.which) ? event.which : event.keyCode;
-	    if ( (keyID >= 48 && keyID <= 57) || (keyID >= 96 && keyID <= 105) || keyID == 8 || keyID == 46 || keyID == 37 || keyID == 39 ) 
-	        return;
-	    else
-	        return false;
-	}
-	function removeChar(event) {
-	    event = event || window.event;
-	    var keyID = (event.which) ? event.which : event.keyCode;
-	    if ( keyID == 8 || keyID == 46 || keyID == 37 || keyID == 39 ){
-	        return;
-	    } else {
-	        event.target.value = event.target.value.replace(/[^0-9]/g, "");
-	    }
-	}
-	
-	//날짜확인
-	function compareDate(){
-		var thisDate = arguments[0].value;		
-		var compare = arguments[1];
-		compare_date = document.getElementById(compare).value;
-		if(compare_date==""){
-			var msg_compareDate;
-			if(compare=="join_day"){
-				msg_compareDate="입사일";
-			}else{
-				msg_compareDate="입영일자";
-			}
-			alert(msg_compareDate+"을(를) 먼저 입력해주세요.");
-			compare_date="";	
-		}else{
-			if(compare_date > thisDate){
-				window.alert('일자를 확인해주세요.');
-				document.getElementById(arguments[0].id).value='';
-			}
-		}
-	}
-	
-	function loadCommonCode(){
-		$.ajax({
-			headers: { 
-				 'Accept': 'application/json',
-			      'Content-Type': 'application/json' 
-	    },
-			url:"getcommonCode",
-			type:"post",
-			dataType : 'json',
-			data:{ "commonCodeType" : commonCodeType },
-			contentType: 'application/json;charset=UTF-8' ,
-	
-			traditional:true,
-				
-		        //Ajax 성공시
-			success : function(data){
-				console.log("로딩성공", data);
-				console.log("데이타 보기"+data[0].code);
-				var commonCode;
-				for(var i=0 ; i<data.length ; i++){
-					if(data[i].gubun=="AA"){
-						document.modi_Form.pos_gbn_code.options.add(
-												new Option(data[i].gubun_name, data[i].code));
-					}else if(data[i].gubun=="BB"){
-						document.modi_Form.dept_code.options.add(
-								new Option(data[i].gubun_name, data[i].code));
-					}else if(data[i].gubun=="MT"){
-						document.modi_Form.mil_type.options.add(
-								new Option(data[i].gubun_name, data[i].code));
-					}else if(data[i].gubun=="ML"){
-						document.modi_Form.mil_level.options.add(
-								new Option(data[i].gubun_name, data[i].code));
-					}else if(data[i].gubun=="KS"){
-						document.modi_Form.kosa_class_code.options.add(
-								new Option(data[i].gubun_name, data[i].code));
-					}
-				}
-				showMember();
-				
-		        //Ajax 실패시
-		    },error : function(status, error,request, data){
-		    	console.log("로딩실패\n"+status+"\n"+error+"\n"+request.responseText+"\n"+request.status+"\n////////");
-		   		return;
-		    }
-			
-		});
-	});
-		
-	/** * 전화번호 포맷으로 변환 * * @param 데이터 */
-	function formatPhone(phoneNum){ 
-		if(isPhone(phoneNum)) { 
-			var rtnNum;
-			var regExp =/(02)([0-9]{3,4})([0-9]{4})$/;
+		//사업자 번호 형식
+		function company_registration_number(reg_num){ 
+			var crn_rtn;
+			var regExp =/([1-9]{1}[0-9]{2})([0-9]{2})([0-9]{5})$/;
 			var myArray;
-			if(regExp.test(phoneNum)){
-				myArray = regExp.exec(phoneNum);
-				rtnNum = myArray[1]+'-' + myArray[2]+'-'+myArray[3];
-				return rtnNum;
+			myArray = regExp.exec(reg_num);
+			rtnNum = myArray[1]+'-' + myArray[2]+'-'+myArray[3];
+			return rtnNum;
+		}
+		
+		//달력형식
+		function calendar_format(num){ 
+			var crn_rtn;
+			var regExp =/([1-2]{1}[0-9]{3})([0-1]{1}[0-9]{1})([0-3]{1}[0-9]{1})$/;
+			var myArray;
+			myArray = regExp.exec(num);
+			rtnNum = myArray[1]+'-' + myArray[2]+'-'+myArray[3];
+			return rtnNum;
+		}
+		
+		
+		
+		/** * 전화번호 포맷으로 변환 * * @param 데이터 */
+		function formatPhone(phoneNum){ 
+			if(isPhone(phoneNum)) { 
+				var rtnNum;
+				var regExp =/(02)([0-9]{3,4})([0-9]{4})$/;
+				var myArray;
+				if(regExp.test(phoneNum)){
+					myArray = regExp.exec(phoneNum);
+					rtnNum = myArray[1]+'-' + myArray[2]+'-'+myArray[3];
+					return rtnNum;
+				} else {
+					regExp =/(0[3-9]{1}[0-9]{1})([0-9]{3,4})([0-9]{4})$/;
+					if(regExp.test(phoneNum)){
+						myArray = regExp.exec(phoneNum);
+						rtnNum = myArray[1]+'-'+myArray[2]+'-'+myArray[3];
+						return rtnNum;
+					} else {
+						return phoneNum;
+					} 
+				} 
 			} else {
-				regExp =/(0[3-9]{1}[0-9]{1})([0-9]{3,4})([0-9]{4})$/;
+				return phoneNum;
+			} 
+		}
+		
+		/** * 핸드폰번호 포맷으로 변환 * * @param 데이터 */
+		function formatMobile(phoneNum) {
+			if(isMobile(phoneNum)) {
+				var rtnNum;
+				var regExp =/(01[016789])([1-9]{1}[0-9]{2,3})([0-9]{4})$/;
+				var myArray;
 				if(regExp.test(phoneNum)){
 					myArray = regExp.exec(phoneNum);
 					rtnNum = myArray[1]+'-'+myArray[2]+'-'+myArray[3];
@@ -546,264 +708,212 @@
 				} else {
 					return phoneNum;
 				} 
+			} else {
+				return phoneNum;
+			}
+		}
+		/** * 전화번호 형식 체크 * * @param 데이터 */
+		function isPhone(phoneNum) {
+			//var regExp =/(02|0[3-9]{1}[0-9]{1})[1-9]{1}[0-9]{2,3}[0-9]{4}$/;
+			var regExp =/(02)([0-9]{3,4})([0-9]{4})$/;
+			var myArray;
+			if(regExp.test(phoneNum)){
+				myArray = regExp.exec(phoneNum);
+				return true; 
+			} else {
+				regExp =/(0[3-9]{1}[0-9]{1})([0-9]{3,4})([0-9]{4})$/;
+				if(regExp.test(phoneNum)){
+					myArray = regExp.exec(phoneNum);
+					return true;
+				} else {
+					return false;
+				} 
 			} 
-		} else {
-			return phoneNum;
-		} 
-	}
-	
-	/** * 핸드폰번호 포맷으로 변환 * * @param 데이터 */
-	function formatMobile(phoneNum) {
-		if(isMobile(phoneNum)) {
-			var rtnNum;
+		}
+		/** * 핸드폰번호 형식 체크 * * @param 데이터 */
+		function isMobile(phoneNum) {
 			var regExp =/(01[016789])([1-9]{1}[0-9]{2,3})([0-9]{4})$/;
 			var myArray;
 			if(regExp.test(phoneNum)){
 				myArray = regExp.exec(phoneNum);
-				rtnNum = myArray[1]+'-'+myArray[2]+'-'+myArray[3];
-				return rtnNum;
-			} else {
-				return phoneNum;
-			} 
-		} else {
-			return phoneNum;
-		}
-	}
-	/** * 전화번호 형식 체크 * * @param 데이터 */
-	function isPhone(phoneNum) {
-		//var regExp =/(02|0[3-9]{1}[0-9]{1})[1-9]{1}[0-9]{2,3}[0-9]{4}$/;
-		var regExp =/(02)([0-9]{3,4})([0-9]{4})$/;
-		var myArray;
-		if(regExp.test(phoneNum)){
-			myArray = regExp.exec(phoneNum);
-			return true; 
-		} else {
-			regExp =/(0[3-9]{1}[0-9]{1})([0-9]{3,4})([0-9]{4})$/;
-			if(regExp.test(phoneNum)){
-				myArray = regExp.exec(phoneNum);
 				return true;
 			} else {
-				return false;
+					return false;
 			} 
-		} 
-	}
-	/** * 핸드폰번호 형식 체크 * * @param 데이터 */
-	function isMobile(phoneNum) {
-		var regExp =/(01[016789])([1-9]{1}[0-9]{2,3})([0-9]{4})$/;
-		var myArray;
-		if(regExp.test(phoneNum)){
-			myArray = regExp.exec(phoneNum);
-			return true;
-		} else {
-				return false;
-		} 
-	}
-
-	
-	//input text 숫자 입력시 자동으로 콤마(,) 입력하기
-	function inputNumberFormat(obj) { 
-		    console.log("원래 salary:::::::"+obj.value);
-		    obj.value = comma(uncomma(obj.value)); 
-	} 
-	function comma(str) { 
-	    str = String(str); 
-	    return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,'); 
-	} 
-	function uncomma(str) { 
-	    str = String(str); 
-	    return str.replace(/[^\d]+/g, ''); 
-	}
-
-	* 	// ---------------------------미리보기 이미지 팝업창 ------------------------
-	function go(img){
-	   var img,x,y,x1,y1
-	      if (img.length < 1) {
-	            alert(" 이미지 파일이 선택되지 않았거나 \n\n 잘못된 파일이름 입니다 ")
-	            document.registform.attachFile.focus();
-	            return false;
-	   } 
-	   aa=LoadImg(img);
-	   x= aa.wd;
-	   y= aa.ht;
-	          x1=500;
-	          y1=400; 
-	       if (x<x1) { 
-	          x1=x;
-	       }
-	       if (y<y1) {
-	          y1=y;
-	       }
-	    window.open('pop.jsp?'+img,'','width='+x1+',height='+y1+',top=100,left=100,scrollbars=1,resizable=1');  
-	}
-	//------------------로딩 이미지 크기 알아냄----------------
-	function LoadImg(img) {
-	 var d=new Object();
-	    var imgInfo = new Image(); //이미지 객체를 생성하고
-	    imgInfo.src = img; //이미지 주소를 대입한후에,
-	 d.wd=imgInfo.width; //이미지의 너비와
-	 d.ht=imgInfo.height; //높이를 구한뒤
-	 return d; //값을 반환
-	} 
-	
-	
-	var imgObj = new Image();
-	function showImgWin(imgName) {
-		imgObj.src = "resources/image/"+imgName;
-		setTimeout("createImgWin(imgObj)", 100);
-	}
-	function createImgWin(imgObj) {
-		if (! imgObj.complete) {
-			setTimeout("createImgWin(imgObj)", 100);
-			return;
 		}
-		imageWin = window.open("", "imageWin",
-		"width=" + imgObj.width + ",height=" + imgObj.height);
-		imageWincument.write("<html><body style='margin:0'>") ;
-		imageWincument.write("<img src=\'" + imgObj.src + "\'>") ;
-		imageWincument.write("</body><html>") ;
-		imageWincument.title = "resources/image/"+imgObj.src;
-	}
-	
-	//사진 미리보기
-	function getThumbnailPrivew(input, targetId) {
-	    if (input.files && input.files[0]) {
-	        var reader = new FileReader();
-	        reader.onload = function (e) {
-	            var element = windowcument.getElementById(targetId);
-	            element.setAttribute("src", e.target.result);
-	            console.log("thumbnail:::::::e.target.result::::::::::"+e.target.result);
-	            console.log("thumbnail:::::::e.target::::::::::"+e.target);
-	        }
-	        reader.readAsDataURL(input.files[0]);
-	    }
-	}
-	
-	document.getElementById('file-input').addEventListener('change', readFile, false);
-
-	function readFile(e) {
-		var fileData;
-		var file = e.target.files[0];
-		if (!file) {
-			return;
-		}
-		var reader = new FileReader();
-		reader.onload = function(e) {
-			eData= e.target.result;
-		    // 파일 데이터를 사용할 기능 구현 
-		};
-		reader.readAsText(file);
-	}
-	
-	function readURL(input) {
-        if (input.files && input.files[0]) {
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            $('#picture').attr('src', e.target.result);
-          }
-          reader.readAsDataURL(input.files[0]);
-        }
-      }
-	
-	
-	
-
-/////////////////////////////////////////////////////이미지파일 저장 관련//////////////////////////////////////////////////////	
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
- 	$(document).ready(function() {
-	    $("#profile_image").on("change", fileChange);
-	}); 
-
-	var sel_file;
-	function fileChange(e) {
-		e.preventDefault();
-
-		var files = e.target.files;
-	    var filesArr = Array.prototype.slice.call(files);
-
-	    filesArr.forEach(function(f) {
-	        if(!f.type.match("image.*")) {
-	            alert("확장자는 이미지 확장자만 가능합니다.");
-	            return;
-	        }
-
-	        sel_file = f;
-
-	        var reader = new FileReader();
-	        reader.onload = function(e) {
-	            $("#picture").attr("src", e.target.result);
-	        }
-	        reader.readAsDataURL(f);
-	    });
-	});
-
-	    var file = files[0];
-	    console.log(file);
-	    var formData = new FormData();
-
-	    var formData = new FormData($("#modi_Form")[0]);
-	    formData.append("file", file);
-	    formData.append("fileUploadFor",$(this).attr("name"));
-
-		$.ajax({
-	    	url: 'fileUpload',
-			data: formData,
-			dataType:'text',
-			processData: false,
-			contentType: false,
-			type: 'POST',
-			success: function(data){
-				alert("프로필 이미지가 변경 되었습니다.")
-			 },
-			error : function(data,error) {
-                alert("파일 업로드에 실패하였습니다.");
-                alert(data);
-                console.log(error);
-                console.log(error.status);
-	       		return;
-			}
-		});
 		
-	 	//파일 저장+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-		$('#profile_image, #cmp_reg, #carrier').change(function() {
+		function showMember(){
 
+			$('#pos_gbn_code').val("${list.pos_gbn_code}");
+			$('#dept_code').val("${list.dept_code}");
+			/* $('#salary').val("${list.salary}");
+			$('#salaryShow').val("${list.salary}");
+			inputNumberFormat(document.modi_Form.salaryShow); */
+			$('#mil_yn').val("${list.mil_yn}");
+			if($('#mil_yn').val()==0){
+				$(".mil").hide();
+			}
+			$('#mil_type').val("${list.mil_type}");
+			$('#mil_level').val("${list.mil_level}");
+			$('#kosa_reg_yn').val("${list.kosa_reg_yn}");
+			$('#kosa_class_code').val("${list.kosa_class_code}");
+			$('#join_day').val("${list.join_day}");
+			$('#retire_day').val("${list.retire_day}");
+			$('#join_gbn_code').val("${list.join_gbn_code}");
+			$('#put_yn').val("${list.put_yn}");
+		
 
- 		function checkImageType(fileName){
- 			var pattern = /jpg$|gif$|png$|jpeg$/i;
- 			return fileName.match(pattern);
- 		}
+		}
+		//처음 로딩
+		function loadCommonCode(){
+			$.ajax({
+//				headers: { 
+//					 'Accept': 'application/json',
+//				      'Content-Type': 'application/json' 
+//			    },
+				url:"getcommonCode",
+				type:"post",
+//				dataType : 'json',
+//				data:{ "commonCodeType" : commonCodeType },
+//				contentType: 'application/json;charset=UTF-8' ,
 
+//				traditional:true,
+			        //Ajax 성공시
+				success : function(data){
+					console.log("로딩성공", data);
+					//console.log("데이타 보기"+data[8].code);
+					var commonCode;
+					for(var i=0 ; i<data.length ; i++){
+						if(data[i].gubun=="AA"){
+							document.modiForm.pos_gbn_code.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="BB"){
+							document.modiForm.dept_code.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="MT"){
+							document.modiForm.mil_type.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="ML"){
+							document.modiForm.mil_level.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="KS"){
+							document.modiForm.kosa_class_code.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="CC"){
+							document.modiForm.join_gbn_code.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="DD"){
+							document.modiForm.mil_yn.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="GG"){
+							document.modiForm.join_type.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="HH"){
+							document.modiForm.gart_level.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="FF"){
+							document.modiForm.put_yn.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="EE"){
+							document.modiForm.kosa_reg_yn.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="II"){
+							document.modiForm.email_2.options.add(
+									new Option(data[i].name, data[i].code));
+						}else if(data[i].gubun=="JJ"){
+							document.modiForm.sex.options.add(
+									new Option(data[i].name, data[i].code));
+						}
+						showMember();
+					}
+			        //Ajax 실패시
+			    },error : function(status, error,request, data){
+			    	console.log("로딩실패\n"+status+"\n"+error+"\n"+request.responseText+"\n"+request.status+"\n////////");
+			   		return;
+			    }
+			});
+			
+			
+		}
+		
+		function imageLoad(){
+			//이미지로드		
+			//출처: http://webclub.tistory.com/489 [Web Club]
+			$.ajax({
+				url: 'imageLoad',
+				type: 'POST',
+				dataType : 'json',
+				success : function (data) {
+					createImages(data);
+					} 
+			});
+		}
 
- 		function getOriginalName(fileName){
- 			if(checkImageType(fileName)){
- 				return;
- 			}
- 			var idx = fileName.indexOf("_") + 1 ;
- 			return fileName.substr(idx);
+	/* 	function createImages(objImageInfo) {
+			var images = objImageInfo.images;
+			var strDOM = ""; 
+			for (var i = 0; i < images.length; i++) { 
+				// N번째 이미지 정보를 구하기
+				var image = images[i]; 
+				// N번째 이미지 패널을 생성
+				
+				strDOM += '<div class="image_panel">';
+				strDOM += ' '<img src="' + image.url + '">';
+				strDOM += ' '<p class="title">' + image.title + ''</p>';
+				strDOM += ''</div>';
+			} 
+			
+			// 이미지 컨테이너에 생성한 이미지 패널들을 추가하기 
+			var $imageContainer = $("#image_container");
+			$imageContainer.append(strDOM);
+		}
+		*/
+	 
+	    // 특수문자, 특정문자열(sql예약어의 앞뒤공백포함) 제거
+	    function checkSearchedWord(obj) {
+	 
+	        if (obj != null && obj != "") {
+	 
+	            //특수문자 제거
+	            var expText = /[%=><+!^*]/;
+	            if (expText.test(obj) == true) {
+	                alert("특수문자를 입력 할수 없습니다.");
+	                $("#txt_SearchText").val(obj.replace(expText, ""));
+	                return false;
+	            }
+	 
+	            //특정문자열(sql예약어의 앞뒤공백포함) 제거
+	            var sqlArray = new Array("AND", "OR", "SELECT", "INSERT", "DELETE", "UPDATE", "CREATE", "ALTER", "DROP", "EXEC", "UNION", "FETCH", "DECLARE", "TRUNCATE", "SHUTDOWN");
+	 
+	            for (var i = 0; i < sqlArray.length; i++) {
+	                if (obj.match(sqlArray[i])) {
+	                    alert(sqlArray[i] + "와(과) 같은 특정문자로 검색할 수 없습니다.");
+	                    $("#txt_SearchText").val(obj.replace(sqlArray[i], ""));
+	                    return false;
+	                }
+	            }
+	        }
+	        return true;
+	    }
 
- 		}
+//		[출처] input text 숫자 입력시 자동으로 콤마(,) 입력하기|작성자 마요네즈
+		function inputNumberFormat(obj) { 
+			    obj.value = comma(uncomma(obj.value)); 
+		} 
+		function comma(str) { 
+		    str = String(str); 
+		    return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,'); 
+		} 
+		function uncomma(str) { 
+		    str = String(str); 
+		    return str.replace(/[^\d]+/g, ''); 
+		}
 
-
- 		function getImageLink(fileName){
-
- 			if(!checkImageType(fileName)){
- 				return;
- 			}
- 			var front = fileName.substr(0,12);
- 			var end = fileName.substr(14);
-
- 			return front + end;
-
- 		}
-	}
-	function showPDF(pdfFile){
-			window.open("resources/image/"+pdfFile, '_blank', 'fullscreen=yes');
-	}
-
-
+		
 </script>
 
 </head>
-<body onload="loadCommonCode()" style="padding: 30px">
+<body style="padding: 30px">
 
 	<div align="right">
 	   <h2>IT & BIZ</h2>
@@ -812,13 +922,13 @@
 	<div align="center">
 		<h1>인사 관리 시스템</h1>
 	</div>
-	<h1>직원 등록</h1>
-	<form id="inputForm" name="inputForm" action="/insaInsert" method="post">
+	<h1>직원 수정</h1>
+	<form id="modiForm" name="modiForm" action="/update" method="post">
 		<div style="float: right;" >
 			<!-- <button type="submit" name="save" id="save" value="저장">저장</button> -->
-			<input type="submit" id="save" value="저장"  />
-			<input type="reset" id="reset" value="초기화"  />
-			<input type="button" id="forward" value="전화면" />
+			<input type="button" id="update" value="수정" />
+			<input type="button" id="delete" value="삭제" />
+			<input type="button" id="forward" name="forward" value="전화면"/>
 		</div>
 	<hr>
 		<table>
@@ -826,185 +936,163 @@
 				<td rowspan="6" align="center">
 					<img alt="사진" src="resources/image/user-empty.png" name="profile_image" id="profile_image"  value="1" class="img-circle" width="100px" height="100px" > <!--alt="사진" src="resources/image/user-empty.png"  -->
 					<br>
-					<input type="file" name="profile_image" id="profile_image" accept=".bmp, .gif, .jpg, .png" onchange="getThumbnailPrivew(this, 'picture');">
+					<input type="text" name="profile_image" id="profile_image" accept=".bmp, .gif, .jpg, .png" onchange="getThumbnailPrivew(this, 'picture');">
 					<input type="hidden" name="profile_image_name" id="profile_image_name" >
 				</td> 
 			</tr>
 			<tr>
 				<td>*사번</td>
 				<td>
-					<input type="text" name="sabun" id="sabun" value="${newSabun}" class="necessary" style="background-color:lightgrey" />
+					<input type="text" name="sabun" id="sabun" value="${list.sabun}" class="necessary" style="background-color:lightgrey" />
 				</td>
 				<td>*한글성명</td>
 				<td>
-					<input type="text" title="한글성명" name="name" id="name" class="necessary" />
+					<input type="text" title="한글성명" name="name" id="name" value="${list.name}" class="necessary" />
 				</td>
 				<td>영문성명</td>
 				<td>
-					<input type="text" name="eng_name" id="eng_name" value=""/>
+					<input type="text" name="eng_name" id="eng_name" value="${list.eng_name}"/>
 				</td>
 			</tr>
 			<tr>
 				<td>*아이디</td>
 				<td>
-					<input type="text" title="아이디" name="id" id="id" class="necessary" />
+					<input type="text" title="아이디" name="id" id="id" value="${list.id}"class="necessary" />
 				</td>
 				<td>*비밀번호</td>
 				<td>
-					<input type="password" title="비밀번호" name="pwd" id="pwd" class="necessary" />
+					<input type="password" title="비밀번호" name="pwd" id="pwd" value="${list.pwd}"class="necessary" />
 				</td>
 				<td>*비밀번호 확인</td>
 				<td>	
-					<input type="password" name="repwd" id="repwd" disabled="disabled"/>
+					<input type="password" name="repwd" id="repwd" value="${list.pwd}" disabled="disabled"/>
 					<input type="hidden" name="passwordCheck" id="passwordCheck" value="false" />
 				</td>
 			</tr>
 			<tr>
 				<td>전화번호</td>
 				<td>
-					<input type="text" name="phone" id="phone" onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)'value=""/>
+					<input type="text" name="phone" id="phone" onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' value="${list.phone}"/>
 				</td>
 				<td>*핸드폰번호</td>
 				<td>
-					<input type="text" title="핸드폰번호" name="hp" id="hp" class="necessary" onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' />
+					<input type="text" title="핸드폰번호" name="hp" id="hp" class="necessary" onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' value="${list.hp}"/>
 				</td>
 				<td>주민번호</td>
 				<td>
-					<input type="text" name="reg_no" id="reg_no" placeholder="******-*******"/>
+					<input type="text" name="reg_no" id="reg_no" value="${list.reg_no}" placeholder="******-*******"/>
 				</td>
 			</tr>
 			<tr>
 				<td>연령</td>
 				<td>
-					<input type="text" id="age" name="age" value="">
+					<input type="text" id="years" name="years" value="${list.years}">
 				</td>
 				<td>*이메일</td>
 				<td>
-					<input type="text" title="이메일" name="email" id="email" class="necessary" />
-					<select name="email" id="email" class="email">
-						<option value="@naver.com">@naver.com</option>
-						<option value="@nate.com">@nate.com</option>
-						<option value="@google.com">@google.com</option>
-						<option>직접입력</option>
-					</select>
+				<input type="text" title="이메일" name="email_1" id="email_1" value="${list.email}" class="necessary" />
+				<select name="email_2" id="email_2" class="email" >
+					
+				</select>
+					<input type="hidden" name="email"/>
 				</td>
 				<td>성별</td>
-				<td>
-					<select name="sex" id="sex" >
-						<option value="0">(선택)</option>
-						<option value="1">남자</option>
-						<option value="2">여자</option>
+				<td>	
+					<select name="sex" id="sex" value="${list.sex}">
+					
 					</select>
 				</td>
 			</tr>
 			<tr>
 				<td>주소</td>
 				<td>
-				<input type="text" id="zip" name="zip" placeholder="우편번호">
-				<input type="button" onclick="sample6_execDaumPostcode()"  value="우편번호 찾기"><br>
-				<input type="text" id="addr1" name="addr1" placeholder="주소"><br>
-				<input type="text" id="addr2" name="add2" placeholder="상세주소">
+				<input type="text" id="zip" name="zip" value="${list.zip}" placeholder="우편번호">
+				<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기">
+				<input type="text" id="addr1" name="addr1" value="${list.addr1}" placeholder="주소">
+				<input type="text" id="addr2" name="addr2" value="${list.addr2}" placeholder="상세주소">
+				<input type="text" id="sample6_extraAddress" placeholder="참고항목">
 				</td>
 			</tr>
 			<tr>
 				<td>입사구분</td>
-				<td>
-					<select  name="put_yn"  value="0">
-						<option value="0">(선택)</option>
-						<option value="1">(투입)</option>
-						<option value="2">(미투입)</option>
+			 	<td>
+					<select id="put_yn" name="put_yn" value="${put_yn}">
+					 
 					</select>
+					
 				</td>
 				<td>직위</td>
 				<td>
-					<select name="pos_gbn_code" id="pos_gbn_code" value="1">
-						<option value="1">(사원)</option>
-						<option value="2">(주임)</option>
-						<option value="3">(대리)</option>
-						<option value="4">(과장)</option>
+					<select id="pos_gbn_code" name="pos_gbn_code" value="${pos_gbn_code}">
+					   
 					</select>
 				</td>
 				<td>부서</td>
 				<td>
-					<select name="dept_code" id="dept_code" value="1">
-						<option value="1">(si사업부)</option>
-						<option value="2">(솔루션)</option>
-						<option value="3">(유지/보수)</option>	
+					<select id="dept_code" name="dept_code" value="${dept_code}">
+					     
 					</select>
 				</td>
 				<td>직종</td>
 				<td>
-					<select name="join_gbn_code" value="1">
-						<option value="1">(파견)</option>
-						<option value="2">(유지/보수)</option>
-						<option value="3">(개발)</option>
+					<select id="join_gbn_code" name="join_gbn_code" value="${join_gbn_code}">
+					   
 					</select>
 				</td>
 				<td>연봉</td>
 				<td>
-					<input type="text" name="salary" id="salary" placeholder="(만원)" 
+					<input style="text-align:right;" type="text" name="salaryShow" id="salaryShow" value="${list.salary}" placeholder="(만원)"
 						onkeydown='return onlyNumber(event)' 
 						onkeyup='removeChar(event), inputNumberFormat(this)'>
-					<input type="hidden" name="salary" id="salary" >
+					<input style="text-align:right;" type="hidden" name="salary" id="salary" >
 				</td>
 			</tr>
 			<tr>
-				<td>군필여부
-						<select name="mil_yn" id="mil_yn">
-						<option value="1" >군필</option>
-						<option value="0" selected="selected">미필</option>
+				<td>군필여부</td>
+				<td>
+					<select id="mil_yn" name="mil_yn" value="${mil_yn}">
+					 
 					</select>
 				</td>
 				<td class="mil">군별</td>
 				<td class="mil">
-					<select name="mil_type"  class="mil" value="1">
-						<option value="1">(육군)</option>
-						<option value="2">(공군)</option>
-						<option value="3">(해군)</option>
+					<select id="mil_type" name="mil_type" value="${mil_type}">
+					  
 					</select>
 					계급
-					<select name="mil_level" class="mil" value="4" >
-						<option value="1">(이병)</option>
-						<option value="2">(일병)</option>
-						<option value="3">(상병)</option>
-						<option value="4">(병장)</option>
-						<option value="5">(하사)</option>
+					<select id="mil_level" name="mil_level" value="${mil_level}">
+					 
 					</select>
 				</td>
 				<td class="mil">입영일자</td>
 				<td class="mil">
-					<input type="date" name="mil_startdate" class="datepicker" id="mil_startdate">
+					<input type="date" name="mil_startdate" class="datepicker" id="mil_startdate" value="${list.mil_startdate}">
 				</td>
 				<td class="mil">전역일자</td>
 				<td class="mil">
-					<input type="date" name="mil_enddate" class="datepicker" id="mil_enddate" onchange="compareDate(this, 'mil_startdate')">
+					<input type="date" name="mil_enddate" class="datepicker" id="mil_enddate" value="${list.mil_enddate}" onchange="compareDate(this, 'mil_startdate')">
 				</td>
 			</tr>
 			<tr>
 				<td>
 					KOSA등록
-					<select name="kosa_reg_yn" value="1" >
-						<option value="1">등록</option>
-						<option value="2" selected="selected">미등록</option>
+					<select id="kosa_reg_yn" name="kosa_reg_yn" value="${kosa_reg_yn}">
+					 
 					</select>
 				</td>
+				<td>KOSA등급</td>
 				<td>
-					KOSA등급
-				</td>
-				<td>
-					<select name="kosa_class_code" value="1">
-						<option value="1">(초급)</option>
-						<option value="2">(중급)</option>
-						<option value="3">(고급)</option>
+					<select id="kosa_class_code" name="kosa_class_code" value="${kosa_class_code}">
+					  
 					</select>
 				</td>
 				<td>*입사일자</td>
 				<td>
-					<input type="date" title="입사일자" name="join_day" class="necessary" id="join_day" value="1">
+					<input type="date" title="입사일자" name="join_day" id="join_day"class="necessary" value="${list.join_day}">
 				</td>
 				<td>퇴사일자</td>
 				<td>
-					<input type="date" name="retire_day" id="retire_day" value="1"> <!-- onchange="compareDate(this, 'join_day')" disabled="disabled" -->
+					<input type="date" name="retire_day" id="retire_day" value="${list.retire_day}"> <!-- onchange="compareDate(this, 'join_day')" disabled="disabled" -->
 					
 				</td>
 				
@@ -1012,64 +1100,41 @@
 			<tr>
 				<td>업체명</td>
 				<td>
-					<input type="text" name="crm_name" value="">
+					<input type="text" name="crm_name" id="crm_name" value="${list.crm_name}">
 				</td>
 				<td>등급</td>
 				<td>
-					<select name="gart_level" >
-						<option value="1">(초급)</option>
-						<option value="2">(중급)</option>
-						<option value="3">(고급)</option>
+					<select id="gart_level" name="gart_level" value="${gart_level}">
+					
 					</select>
 				</td>
 				<td>입사여부</td>
 				<td>
-					<select name="join_type" value="0">
-						<option value="0">(선택)</option>
-						<option value="1">(근무중)</option>
-						<option value="2">(퇴사)</option>
+					<select id="join_type" name="join_type" value="${join_type}">
+					 
 					</select>
 				</td>
+				<td>사업자번호</td>
 				<td>
-					사업자번호
+					<input type="text" name="cmp_reg_no" id="cmp_reg_no" value="${list.cmp_reg_no}" cols="20"
+							onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)' >
 				</td>
-				<td>
-					<input type="text" name="cmp_reg_no" id="cmp_reg_no" value="" cols="20"
-							onkeydown='return onlyNumber(event)' onkeyup='removeChar(event)'>
 				</td>
-				<td>
-					사업자등록증
-				</td>
-				<td>
-					<input type="file" name="cmp_reg" id="cmp_reg" accept=".bmp, .gif, .jpg, .png" style="display:none;"> <!-- accept=".bmp, .gif, .jpg, .png" style="display:none;"  -->
-					<label for="cmp_reg" id="cmp_reg_imagefile_lbl" 
-								style="border: 2px dotted black; border-radius: 5px; padding: 2px;">파일업로드</label>
-					<input type="hidden" name="cmp_reg_image" id="cmp_reg_image" >	 
-				</td>
-				<td>
-					<input type="button" name="preview_cmp_reg" class="preview" value="미리보기" onclick="showImgWin(cmp_reg_imagefile.value)">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					자기소개
+				<td>자기소개</td>
 				<td colspan="3">
-					<textarea name="self_intro" id="self_intro" cols="60" placeholder="100자 내외로 적으시오"></textarea>
+					<input type="text" name="self_intro" id="self_intro" cols="60" value="${list.self_intro}">
 				</td>
+				</tr>
+				<%-- <tr>
+				<td>사업자등록증</td>
+				<td>
+					<input type="text" name="cmp_reg" id="cmp_reg" value="${list.cmp_reg}"> 
 				
+				<td>이력서</td>
 				<td>
-					이력서
+					<input type="text" name="carrier" id="carrier" value="${list.carrier}"> 
 				</td>
-				<td>
-					<input type="file" name="carrier" id="carrier" accept=".pdf" style="display:none;"> <!--  accept=".pdf" style="display:none;" -->
-					<label for="carrier" id="carrier_image_lbl" 
-							style="border: 2px dotted black; border-radius: 5px; padding: 2px;">파일업로드</label>
-					<input type="hidden" name="carrier_image" id="carrier_image" >
-				</td>
-				<td>
-					<input type="button" name="preview_cmp_reg" class="preview" value="미리보기" onclick="showImgWin(cmp_reg_imagefile.value)">
-				</td>
-			</tr>
+				</tr> --%>
 		</table>
 	</form>
 </body>

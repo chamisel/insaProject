@@ -1,6 +1,8 @@
 package pm.insa.com.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,6 +20,7 @@ import pm.insa.com.service.PmService;
 import pm.insa.com.vo.Member;
 import pm.insa.com.vo.PmVo;
 import pm.insa.com.vo.PubVo;
+import pm.insa.com.vo.SearchVo;
 import pm.insa.com.vo.Test;
 
 @Controller
@@ -50,28 +53,30 @@ public class HomeController {
   		mav.setViewName("/test");
   		return mav;
     
-    }//인사 등록 폼 컨트롤러
+    }
+
+  	//인사 등록 폼 컨트롤러
   	 @GetMapping("/insaInsert") 
   	 public ModelAndView insert(HttpServletRequest request, ModelAndView mav) {
   		System.out.println("[pmController mav"+mav);
-  		List<PubVo> putYn = pmService.putYn();
-		mav.addObject("putYn", putYn);
-  		mav.setViewName("/insaInsert"); 
-  		return mav;
-  			  
-  	}
-  	//인사 조회 폼 액션 컨트롤러		
-	 @PostMapping("/insaInsert") 
-	 public ModelAndView insert(HttpServletRequest request, ModelAndView mav, PmVo pmVo) {
-		System.out.println("[pmController mav]"+mav);
-		System.out.println("[pmController pmVo]"+pmVo); pmService.insert(pmVo);
+		int newSabun = pmService.getNewSabun();
+		System.out.println("[pmController newSabun]"+newSabun);
+		mav.addObject("newSabun", newSabun);
 		mav.setViewName("/insaInsert"); 
   		return mav;
   			  
   	}
+  	//인사 등록 폼 액션 컨트롤러		
+  	@RequestMapping("/insaInsert")
+	 public ModelAndView insert(HttpServletRequest request, ModelAndView mav, @RequestBody PmVo pmVo) {
+		System.out.println("[pmController pmVo]"+pmVo);
+		pmService.insert(pmVo);
+		return mav;
+		
+  	}
 
-  	//인사 조회 폼 컨트롤러
-	@GetMapping("/insaList") 
+	//인사 조회 폼 컨트롤러
+  	@RequestMapping("/insaList") 
   	public ModelAndView selectInsa(HttpServletRequest request, ModelAndView mav) {
 		System.out.println("[pmController selectInsa]"); 
 		mav.setViewName("/insaList");
@@ -84,12 +89,15 @@ public class HomeController {
 		System.out.println("컨트롤러:::existThisMember:::사번:::"+request.getParameter("sabun"));
 		if(request.getParameter("sabun")==null){
 			isExist=false;
+			System.out.println("컨트롤러:::existThisMember:::"+isExist);
 		}else{
 			int sabun = Integer.parseInt(request.getParameter("sabun"));
 			if(pmService.insaDetail(sabun)!=null){
 				isExist=true;			//있으면 true
+				System.out.println("컨트롤러:::existThisMember:::"+isExist);
 			}else{
 				isExist=false;			//없으면 false
+				System.out.println("컨트롤러:::existThisMember:::"+isExist);
 			}
 		}
 		System.out.println("컨트롤러:::existThisMember:::"+isExist);
@@ -109,15 +117,13 @@ public class HomeController {
 		return mav;
 	}
 	//검색
-	@GetMapping("/search")
-	@ResponseBody
-	public List<Member> search(HttpServletRequest request, ModelAndView mav, Member member) throws Exception{
+	@RequestMapping("/search")
+	@ResponseBody 
+	public List<PmVo> search(HttpServletRequest request, SearchVo svo) throws Exception{
 		System.out.println("[pmController search]");
-		List<Member> list = pmService.search(member);
-		for(Member m : list){
-			System.out.println("컨트롤러 search: "+m.toString());
-		}
-		mav.addObject("search", list);
+		ModelAndView mav = new ModelAndView();
+		List<PmVo> list = pmService.search(svo);
+		System.out.println("controller 가져온 list: "+ list);
 		mav.setViewName("/insaList");
 		return list;
 	}
@@ -125,19 +131,34 @@ public class HomeController {
 	@RequestMapping("/getcommonCode")
 	@ResponseBody
 	public List<PubVo> getCommonCode(HttpServletRequest request){
+		System.out.println("------");
 		ModelAndView mav = new ModelAndView();
 		List<PubVo> getCommonCode = pmService.getCommonCode();
+		System.out.println(getCommonCode);
 		mav.addObject("getCommonCode", getCommonCode);
 		return getCommonCode;
 	}
-	//삭제 - 수정필요
+	//삭제
 	@RequestMapping("/del")
-	public String del(HttpServletRequest request){
+	public ModelAndView del(HttpServletRequest request, int sabun){
 		System.out.println("컨트롤러 del sabun: "+request.getParameter("sabun"));
-		pmService.del(Integer.parseInt(request.getParameter("sabun")));
-		return "getPage";
+		ModelAndView mav = new ModelAndView();
+		pmService.del(sabun);
+		mav.setViewName("/insaDetail");
+		return mav;
+		
 	}
+		
+	
 	//업데이트
+	@RequestMapping("/update")
+	 public ModelAndView update(HttpServletRequest request, ModelAndView mav, @RequestBody PmVo pmVo) {
+		System.out.println("[pmController pmVo]"+pmVo);
+		pmService.update(pmVo);
+		mav.setViewName("insaDetail");
+		return mav;
+		
+ 	}
 	//입력페이지 초기화시, 새 사번 가져오기
 	@RequestMapping("/reset")
 	@ResponseBody
@@ -160,24 +181,15 @@ public class HomeController {
 	//상세 보기
 	@RequestMapping("/insaDetail")
 	public ModelAndView getMember(HttpServletRequest request, @RequestParam("pickSabun") String sabun){
-		System.out.println("컨트롤러 getOne : 선택된 사번 : "+sabun);
+		System.out.println("컨트롤러 insaDetail : 선택된 사번 : "+sabun);
 		ModelAndView mav = new ModelAndView();
+		PmVo list = pmService.insaDetail(Integer.parseInt(sabun));
 		if(sabun!=null){
-			List<PmVo> list = pmService.insaDetail(Integer.parseInt(sabun));
-			System.out.println("컨트롤러 getOne : 받아온 사람 : "+list.toString());
+			System.out.println("컨트롤러 insaDetail : 받아온 사람 : "+list.toString());
 			System.out.println("resources/image/1-pic_file.jpg : 리얼패스 : "+request.getSession().getServletContext().getRealPath("resources/image/1-pic_file.jpg"));
 			mav.addObject("list", list);
-			mav.setViewName("/insaDetail");
 		}
+		mav.setViewName("/insaDetail");
 		return mav;
-	}
-	//put_yn 바인딩
-	@RequestMapping("/putYn")
-	public ModelAndView putYn(HttpServletRequest request) {
-		System.out.println("[pmController putYn]");
-		ModelAndView mav = new ModelAndView();
-		
-		return mav;
-		
 	}
 }

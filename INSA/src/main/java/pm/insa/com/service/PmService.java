@@ -1,6 +1,7 @@
 package pm.insa.com.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import pm.insa.com.mapper.PmMapper;
 import pm.insa.com.vo.Member;
 import pm.insa.com.vo.PmVo;
 import pm.insa.com.vo.PubVo;
+import pm.insa.com.vo.SearchVo;
 import pm.insa.com.vo.Test;
 
 @Service
@@ -25,48 +27,59 @@ public class PmService {
 		System.out.println("[PmService test]"+test);
 		pmMapper.test(test);
 		}
-		//인사 등록 서비스 
+		
+		//인사 등록 폼 액션서비스 
 		public void insert(PmVo pmVo) {
-		System.out.println("[PmService pmVo]"+pmVo);
+		System.out.println("[PmService insert2]"+pmVo);
 		System.out.println("[pmMapper]"+pmMapper);
-		pmMapper.insert(pmVo); 
+		pmMapper.insert(pmVo);
+		
 		}
 		//인사 조회 서비스 
 		public void select(PmVo pmVo) {
 			System.out.println("[PmService pmVo]"+pmVo);
 			System.out.println("[pmMapper]"+pmMapper);
-			pmMapper.insert(pmVo); 
+			pmMapper.select();
+	
 		}
 		//검색 
-		public List<Member> search(Member member) {
-			List<Member> list = pmMapper.search(member);
+		public List<PmVo> search(SearchVo svo) {
+			System.out.println("search 서비스");
+			List<PmVo> list = pmMapper.search(svo);
+			System.out.println("service 가져온 리스트"+list);
 			// TODO Auto-generated method stub
 			return list;
 		}
 		//공통
 		public List<PubVo> getCommonCode() {
 			List<PubVo> list = pmMapper.getCommonCode();
+			System.out.println("list"+list);
 			return list;
 		}
-		public void del(int parseInt) {
-			pmMapper.del(parseInt);
+		//삭제
+		public void del(int sabun) {
+			pmMapper.del(sabun);
 			
 		}
-		public void update(Member member) {
-			pmMapper.update(member);
+		//업데이트
+		public void update(PmVo pmVo) {
+			pmMapper.update(pmVo);
 		}
+		//사번 증가
 		public int getNewSabun() {
 			int newSabun = pmMapper.getNewSabun();
 			return newSabun;
 		}
-		public List<PmVo> insaDetail(int sabun) {
-			List<PmVo> list = pmMapper.insaDetail(sabun);
+		//상세보기
+		public PmVo insaDetail(int sabun) {
+			PmVo list = pmMapper.insaDetail(sabun);
 			return list;
 		}
 		public int sabunIncrease() {
-			pmMapper.sabunIncrease();
-			return 0;
+			int newSabun = pmMapper.sabunIncrease();
+			return newSabun;
 		}
+		//전체 검색
 		public List<Member> getAll(){
 			List<Member> list = pmMapper.getAll();
 			return list;
@@ -80,11 +93,6 @@ public class PmService {
 			pmMapper.fileSave(sabun, file_type, mFile);
 			String saveFileDb = null;
 			return saveFileDb;
-		}
-		//투입 여부 바인딩
-		public List<PubVo> putYn(){
-			List<PubVo> list = pmMapper.putYn();
-			return list;
 		}
 
 }

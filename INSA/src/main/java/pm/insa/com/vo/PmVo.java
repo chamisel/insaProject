@@ -26,7 +26,7 @@ public class PmVo {
 	private String join_gbn_code;
 	private String id;
 	private String pwd;
-	private String salary;
+	private int salary;
 	private String kosa_reg_yn;
 	private String kosa_class_code;
 	private String mil_yn;
@@ -100,10 +100,10 @@ public class PmVo {
 	public void setCarrier(String carrier) {
 		this.carrier = carrier;
 	}
-	public String getpos_gbn_code() {
+	public String getPos_gbn_code() {
 		return pos_gbn_code;
 	}
-	public void setpos_gbn_code(String pos_gbn_code) {
+	public void setPos_gbn_code(String pos_gbn_code) {
 		this.pos_gbn_code = pos_gbn_code;
 	}
 	public String getCmp_reg_no() {
@@ -178,10 +178,10 @@ public class PmVo {
 	public void setPwd(String pwd) {
 		this.pwd = pwd;
 	}
-	public String getSalary() {
+	public int getSalary() {
 		return salary;
 	}
-	public void setSalary(String salary) {
+	public void setSalary(int salary) {
 		this.salary = salary;
 	}
 	public String getKosa_reg_yn() {
@@ -276,5 +276,5 @@ public class PmVo {
 				+ ", self_intro=" + self_intro + ", crm_name=" + crm_name + ", profile_image=" + profile_image
 				+ ", carrier_image=" + carrier_image + "]";
 	}
-
+	
 }

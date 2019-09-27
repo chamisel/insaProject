@@ -27,7 +27,7 @@
 			var form = document.createElement("form");
 		  	form.setAttribute("charset", "UTF-8");
 		    form.setAttribute("method", "Post");  //Post 방식
-		    form.setAttribute("action", "/del"); //요청 보낼 주소
+		    form.setAttribute("action", "del"); //요청 보낼 주소
 	
 		    var hiddenField = document.createElement("input");
 		    hiddenField.setAttribute("type", "hidden");
@@ -46,7 +46,7 @@
 		});
 		
 		$('#forward').click(function(){
-			location.href="/sys/goGet";
+			location.href="/insaList";
 		});
 		
 		//input을 datepicker로 선언
@@ -229,11 +229,6 @@
 			}else{
 				$('#hp').val(formatMobile($('#hp').val()));
 			}
-		});
-		
-		
-		$('#zip').click(function(){
-			goPopup();
 		});
 		
 		
@@ -498,20 +493,38 @@
 				var commonCode;
 				for(var i=0 ; i<data.length ; i++){
 					if(data[i].gubun=="AA"){
-						document.modi_Form.pos_gbn_code.options.add(
-												new Option(data[i].gubun_name, data[i].code));
+						document.inputForm.pos_gbn_code.options.add(
+								new Option(data[i].name, data[i].code));
 					}else if(data[i].gubun=="BB"){
-						document.modi_Form.dept_code.options.add(
-								new Option(data[i].gubun_name, data[i].code));
+						document.inputForm.dept_code.options.add(
+								new Option(data[i].name, data[i].code));
 					}else if(data[i].gubun=="MT"){
-						document.modi_Form.mil_type.options.add(
-								new Option(data[i].gubun_name, data[i].code));
+						document.inputForm.mil_type.options.add(
+								new Option(data[i].name, data[i].code));
 					}else if(data[i].gubun=="ML"){
-						document.modi_Form.mil_level.options.add(
-								new Option(data[i].gubun_name, data[i].code));
+						document.inputForm.mil_level.options.add(
+								new Option(data[i].name, data[i].code));
 					}else if(data[i].gubun=="KS"){
-						document.modi_Form.kosa_class_code.options.add(
-								new Option(data[i].gubun_name, data[i].code));
+						document.inputForm.kosa_class_code.options.add(
+								new Option(data[i].name, data[i].code));
+					}else if(data[i].gubun=="CC"){
+						document.inputForm.join_gbn_code.options.add(
+								new Option(data[i].name, data[i].code));
+					}else if(data[i].gubun=="DD"){
+						document.inputForm.mil_yn.options.add(
+								new Option(data[i].name, data[i].code));
+					}else if(data[i].gubun=="GG"){
+						document.inputForm.join_type.options.add(
+								new Option(data[i].name, data[i].code));
+					}else if(data[i].gubun=="HH"){
+						document.inputForm.gart_level.options.add(
+								new Option(data[i].name, data[i].code));
+					}else if(data[i].gubun=="FF"){
+						document.inputForm.put_yn.options.add(
+								new Option(data[i].name, data[i].code));
+					}else if(data[i].gubun=="EE"){
+						document.inputForm.kosa_reg_yn.options.add(
+								new Option(data[i].name, data[i].code));
 					}
 				}
 				showMember();
@@ -523,19 +536,6 @@
 		    }
 			
 		});
-	}
-	
-	// 주소검색을 수행할 팝업 페이지를 호출합니다.
-	function goPopup(){
-		// 호출된 페이지(jusopopup.jsp)에서 실제 주소검색URL(http://www.juso.go.kr/addrlink/addrLinkUrl)를 호출하게 됩니다.
-		var pop = window.open("jusoPopup","pop","width=590,height=420, scrollbars=yes, resizable=yes"); 
-	}
-	// 팝업페이지에서 주소입력한 정보를 받아서, 현 페이지에 정보를 등록합니다.
-	function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAddr, jibunAddr, zipNo, admCd, rnMgtSn, bdMgtSn,detBdNmList,bdNm,bdKdcd,siNm,sggNm,emdNm,liNm,rn,udrtYn,buldMnnm,buldSlno,mtYn,lnbrMnnm,lnbrSlno,emdNo){
-			document.modi_Form.addr1.value = roadAddrPart1; // 도로명주소
-			document.modi_Form.addr2.value = addrDetail; // 상세주소
-			document.modi_Form.zip.value = zipNo; // 우편번호
-			self.close();
 	}
 	
 	
@@ -938,8 +938,7 @@
 				</td>
 			<td>
 				<select name="puy_yn" id="puy_yn" >
-					<option value="0">미투입</option>
-					<option value="1">투입</option>
+					<option value="">(선택)</option>
 					
 				</select>
 			</td>
@@ -1012,8 +1011,7 @@
 				KOSA등록
 			
 				<select name="kosa_reg_yn" id="kosa_reg_yn">
-					<option value="1">등록</option>
-					<option value="0" selected="selected">미등록</option>
+					<option value="">(선택)</option>
 				</select>
 			</td>
 			<td>
