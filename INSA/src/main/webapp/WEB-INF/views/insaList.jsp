@@ -50,9 +50,6 @@
 			if(selectForm.elements[idx].value.trim().length>0 && selectForm.elements[idx].type!="button"){	//값이 있는지 확인
 				str += "인풋의 "+selectForm.elements[idx].name+"에 값있음 : "+selectForm.elements[idx].value+"\n";
 				flagForSend=false;		//값이 있으면 getList, 값이 없으면 getAll
-			}else{
-				flagForSend=true;	
-				str="인풋에 값없음";
 			}
 		}
 		console.log(selectForm.elements.length);
@@ -70,9 +67,9 @@
 			console.log("------------조건불러오기---------");
 			ajaxCall_forGetList();
 			
- 			selectForm.action="search";
+ 			/* selectForm.action="search";
 			selectForm.method="post";
-			selectForm.submit(); 
+			selectForm.submit();  */
 
 		}
 	}
@@ -412,7 +409,7 @@
 		</div>
 	<body>
 	<h1 style="margin-top: 0px;">직원 리스트</h1>
-	<form id="selectForm" name="selectForm" action="/getAll" method="post">
+	<form id="selectForm" name="selectForm" method="post">
 		<!-- 버튼 라인 -->
 		
 			<input type="button" id="search" value="검색" onclick="send(this.form)"/>
