@@ -104,22 +104,28 @@ public class HomeController {
 		
 		return isExist;
 	}
+	
 	//리스트 조회
 	@RequestMapping("/getAll")
 	@ResponseBody
-	public List<Member> getAll(HttpServletRequest request){
+	public List<PmVo> getAll(HttpServletRequest request){
 		System.out.println("[pmController getAll]");
-		List<Member> list = pmService.getAll();
+		ModelAndView mav = new ModelAndView();
+		List<PmVo> list = pmService.getAll();
 		System.out.println("[pmController list]"+list);
+		mav.addObject("list", list);
+		mav.setViewName("insaList");
 		return list;
 	}
 	//검색
 	@RequestMapping("/search")
 	@ResponseBody 
-	public List<PmVo> search(HttpServletRequest request, SearchVo svo) throws Exception{
+	public List<PmVo> search(HttpServletRequest request,@RequestBody SearchVo searchVo){
 		System.out.println("[pmController search]");
-		List<PmVo> list = pmService.search(svo);
+		ModelAndView mav = new ModelAndView();
+		List<PmVo> list = pmService.search(searchVo);
 		System.out.println("controller 가져온 list: "+ list);
+		mav.addObject("list", list);
 		return list;
 	}
 	//공통 테이블

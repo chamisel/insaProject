@@ -34,13 +34,6 @@
 		
 	}
 		
-					
-				
-				
- 				/* document.getElement
-				ById("myRange").disabled = true;  */
-	
-	
 	//검색
 	function send(){
 		var selectForm = arguments[0];
@@ -52,17 +45,16 @@
 				flagForSend=false;		//값이 있으면 getList, 값이 없으면 getAll
 			}
 		}
-		console.log(selectForm.elements.length);
 		console.log(str);
 		var getterList;
-		if(flagForSend=true){
+		if(flagForSend){
 			console.log("----------전체불러오기----------");
-			ajaxCall_forGetAll(1);
+			ajaxCall_forGetAll();
 			
- 			selectForm.action="getAll";
+		 	/* selectForm.action="getAll";
 			selectForm.method="post";
-			selectForm.submit(); 
-
+			selectForm.submit();  */
+ 
 		}else{
 			console.log("------------조건불러오기---------");
 			ajaxCall_forGetList();
@@ -74,38 +66,29 @@
 		}
 	}
 	
-	function ajaxCall_forGetAll(thisPage){
-		console.log("겟페이지:::ajaxCall_forGetAll(thisPage):::"+thisPage);
-		console.log("////////////////////전체실행////////////////////");
-		var formData = new FormData();
-		formData.append("page",thisPage);
+	function ajaxCall_forGetAll(){
+		console.log("겟페이지:::ajaxCall_forGetAll(thisPage):::");
 		$.ajax({
+			headers: { 
+//				'Accept': 'application/json',
+//			    'Content-Type': 'application/json' 
+		    },
 			url: "getAll",
-			data : formData,
 			type:"post",
-			processData : false,
-            contentType : false,
-//			dataType : 'application/json;charset=UTF-8' ,
-//			contentType: 'application/json;charset=UTF-8' ,
+//			dataType : 'json',
+			data:JSON.stringify($('#selectForm').serializeObject()),
+			contentType: 'application/json;charset=UTF-8' ,
 	//		traditional:true,
 	        //Ajax 성공시
 			success : function(data){
 				console.log("--------불러오기 성공-------\n DATA : ", data);
 	//			console.log("데이타 확인 0번 : "+data[0].sabun);
-				
-	
-			/* 	if(data.indexOf("업")){
+				if(data.length!=0){
 					makeList(data);
 				}else{
+					makeList(null);
 					alert("해당 결과가 없습니다.");
 				}
-			 */	
-				
-				$('#listView').html(data);
-				if(data.indexOf("검색된 데이터가 없습니다.")>0){
-					
-				}
-				
 		    },
 	        //Ajax 실패시
 		    error : function(status, error,request, data){
@@ -115,7 +98,7 @@
 		});
 	}
 	function ajaxCall_forGetList(){
-		console.log("JSON:"+JSON.stringify($('#selectForm').serializeObject()));
+		console.log("겟페이지:::ajaxCall_forGetList:::");
 		$.ajax({
 			headers: { 
 //				'Accept': 'application/json',
@@ -129,7 +112,7 @@
 	//		traditional:true,
 	        //Ajax 성공시
 			success : function(data){
-				console.log("--------불러오기 성공-------\n DATA : ");
+				console.log("--------불러오기 성공-------\n DATA : ", data);
 	//			console.log("데이타 확인 0번 : "+data[0].sabun);
 				if(data.length!=0){
 					makeList(data);
@@ -150,7 +133,7 @@
 		var obj = null;
 		try {
 			if(this[0].tagName && this[0].tagName.toUpperCase() == "FORM" ) {
-				console.log("insaList:::serializeObject 실행");
+				console.log("getPage:::serializeObject 실행");
 				var arr = this.serializeArray();
 				console.log(arr);
 				if(arr){ 
@@ -203,24 +186,33 @@
 				}else if(row.pos_gbn_code=="0006"){
 					strpos_gbn_code="사장";
 				}
-				html +="<tr class=\"resultRow\" onclick=\"resultRowClick(this)\"><td class=\"td_sabun\">"+row.sabun+"</td><td>"
+				 /* html +="<tr class=\"resultRow\" onclick=\"resultRowClick(this)\"><td class=\"td_sabun\">"+row.sabun+"</td><td>"
 					+row.name+"</td><td>"+row.reg_no+"</td><td>"
 					+row.hp+"</td><td>"+strpos_gbn_code+"</td><td>"
 					+row.join_day+"</td><td>"+row.retire_day+"</td><td>"
-					+strput_yn+"</td><td align=\"right\">"+comma(row.salary)+"</td></tr>";
-			
-				
-				
+					+strput_yn+"</td><td align=\"right\">"+comma(row.salary)+"</td></tr>";  */
+
+				html +="<tr class=\"resultRow\">";
+				html +="	<td>" +row.sabun+ "</td>";
+				html +="	<td>" +row.name+ "</td>";
+				html +="	<td>" +row.reg_no+ "</td>";
+				html +="	<td>" +row.hp+ "</td>";
+				html +="	<td>" +strpos_gbn_code+ "</td>";
+				html +="	<td>" +row.join_day+ "</td>";
+				html +="	<td>" +row.retire_day+ "</td>";
+				html +="	<td>" +strput_yn+ "</td>";
+				html +="	<td align=\"right\">" +comma(row.salary)+ "</td>";
+				html +="</tr>";
 				
 			}
 		} 
-		
-	
+
 		$('#listView').html(html);
-//		$('#listView').innerHTML = html;
- 		console.log("html : " + $('#listView').html());
-        console.log("후 : " + $('#listTable').html()); 
-        
+		
+		$('#listView').innerHTML = html;
+		
+ 		//console.log("html : " + $('#listView').html());
+          
 
 
 	}
@@ -230,28 +222,7 @@
 	    return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,'); 
 	} 
 	
-	function resultRowClick(obj){
-		var theSabun = obj.cells[0].innerHTML;
-		console.log("나는 누구인가 : "+obj.nodeName);
-		console.log("cells[0] : "+obj.cells[0].innerHTML);
-		console.log("obj.cells.length : "+obj.cells.length);
-		alert("선택 사번 : "+theSabun);
-		
-		//form 동적 생성
-		 var form = document.createElement("form");
-         form.setAttribute("charset", "UTF-8");
-         form.setAttribute("method", "Post");  //Post 방식
-         form.setAttribute("action", "getOne"); //요청 보낼 주소
 
-         var hiddenField = document.createElement("input");
-         hiddenField.setAttribute("type", "hidden");
-         hiddenField.setAttribute("name", "pickSabun");
-         hiddenField.setAttribute("value", theSabun);
-         form.appendChild(hiddenField);
-         
-         document.body.appendChild(form);
-         form.submit();
-	}
 	function loadCommonCode(){
 		$.ajax({
 //			headers: { 
@@ -309,20 +280,20 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	$(document).ready(function(){
-		loadCommonCode();
+	 	 loadCommonCode();
 		$('#put_yn').change(function(){
 			console.log($('#put_yn').val());
 		});
 		$('#pos_gbn_code').change(function(){
 			console.log($('#pos_gbn_code').val());
-		});
+		}); 
 		
 		$('.resultRow').click(function(){
 			var theSabun = $(this).children().eq(0).text();
 			alert("선택 사번 : "+theSabun);
 			location.href="/insaDetail?sabun="+theSabun;
 		});  
-
+ 
 /* 	 		$('#reset').click(function(){
 				alert("reset");
 				$(":text").val()="";
@@ -443,7 +414,7 @@
 				<!-- 직위 -->
 					<td>직위</td>
 					<td>
-						<select name="pos_gbn_code" id="pos_gbn_code" value="">
+						<select name="pos_gbn_code" id="pos_gbn_code">
 							<option></option>
 						</select>
 					</td>
@@ -481,14 +452,17 @@
 			</tr>
 		</thead>
 		<tbody id="listView">
-			<c:choose>
+			<tr>
+				<td colspan="9" align="center">검색된 데이터가 없습니다.</td>
+			</tr>
+			<%-- <c:choose>
 				<c:when test="${empty list || list==null }">
 					<tr>
 						<td colspan="9" align="center">검색된 데이터가 없습니다.</td>
 					</tr>
 				</c:when>
 				 <c:otherwise>
-					<c:forEach  items="${list}" var="searchResult">
+					<c:forEach items="${list}" var="searchResult">
 						<tr class="resultRow">
 								<td align="center" id="td_sabun"><a href="/insaDetail?pickSabun=${searchResult.sabun}">${searchResult.sabun}</td>
 								<td align="center" id="td_name">${searchResult.name}</a></td>
@@ -502,7 +476,7 @@
 						</tr>
 					</c:forEach>
 				</c:otherwise>			
-			</c:choose>
+			</c:choose> --%>
 		</tbody>
 		<tfoot>
 						

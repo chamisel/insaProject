@@ -43,11 +43,10 @@ public class PmService {
 	
 		}
 		//검색 
-		public List<PmVo> search(SearchVo svo) {
+		public List<PmVo> search(SearchVo searchVo) {
 			System.out.println("search 서비스");
-			List<PmVo> list = pmMapper.search(svo);
+			List<PmVo> list = pmMapper.search(searchVo);
 			System.out.println("service 가져온 리스트"+list);
-			// TODO Auto-generated method stub
 			return list;
 		}
 		//공통
@@ -80,10 +79,11 @@ public class PmService {
 			return newSabun;
 		}
 		//전체 검색
-		public List<Member> getAll(){
-			List<Member> list = pmMapper.getAll();
+		public List<PmVo> getAll(){
+			List<PmVo> list = pmMapper.getAll();
 			return list;
 		}
+		
 		public String fileSave(String path, String fileName, MultipartFile mFile) {
 			pmMapper.fileSave(path, fileName, mFile);
 			String fileFullPath = null;

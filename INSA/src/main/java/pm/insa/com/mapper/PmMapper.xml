@@ -89,38 +89,34 @@
 						#{carrier_image})
 	</insert> 
 	<!-- 리스트 조회 -->
-	<select id="getAll" resultType="pm.insa.com.vo.Member">
-			SELECT  sabun, 
-					name, 
-					reg_no, 
-					hp,  
-					(SELECT name FROM PUB WHERE gubun='AA' AND PUB.code=INSA.pos_gbn_code) AS pos_gbn_code, 
-					TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS join_day, 
-					TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS retire_day, 
-					(SELECT name FROM PUB WHERE gubun='FF' AND PUB.code=INSA.put_yn)put_yn, 
-					salary 
-			FROM INSA 
+	<select id="getAll" resultType="pm.insa.com.vo.PmVo">
+			SELECT  sabun,
+					name,
+					reg_no,
+					hp,
+					(SELECT code FROM PUB WHERE gubun='AA' AND PUB.code=INSA.pos_gbn_code) AS pos_gbn_code,
+					TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS join_day,
+					TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS retire_day,
+					(SELECT code FROM PUB WHERE gubun='FF' AND PUB.code=INSA.put_yn)put_yn,
+					salary
+			FROM INSA
 			ORDER BY sabun
 	</select>
 	<!-- 검색 리스트 -->
 	<select id="search" parameterType="pm.insa.com.vo.SearchVo" resultType="pm.insa.com.vo.PmVo">
-			SELECT  sabun, 
-					name, 
-					reg_no, 
-					hp,  
-					(SELECT code FROM PUB WHERE gubun='AA' AND PUB.code=INSA.pos_gbn_code) AS pos_gbn_code, 
-					TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS join_day, 
-					TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS retire_day, 
+			SELECT  sabun,
+					name,
+					reg_no,
+					hp,
+					(SELECT code FROM PUB WHERE gubun='AA' AND PUB.code=INSA.pos_gbn_code) AS pos_gbn_code,
+					TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS join_day,
+					TO_CHAR(SYSDATE, 'YYYY-MM-DD') AS retire_day,
 					(SELECT code FROM PUB WHERE gubun='FF' AND PUB.code=INSA.put_yn) AS put_yn,
 					salary
-					
-			FROM INSA 			
-				 <where>
-				 	<if test="sabun!= null and sabun!=''">
-				        sabun = #{sabun}
-				    </if>
+			FROM INSA
+				<where>
 				    <if test="name!= null and name!=''">
-				        AND name like '%' || #{name} || '%'
+				        name like  '%' || #{name} || '%'
 				    </if>
 				    <if test="pos_gbn_code!= null and pos_gbn_code!=''">
 				        AND pos_gbn_code=#{pos_gbn_code}
@@ -131,11 +127,11 @@
 				    <if test="retire_day!= null and retire_day!=''">
 				        AND retire_day like '%' ||#{retire_day} || '%'
 				    </if>
-				    <if test="put_yn!= null and put_yn!=''">
-				        AND put_yn=#{put_yn}
+				    <if test="join_gbn_code!= null and join_gbn_code!=''">
+				        AND join_gbn_code=#{join_gbn_code}
 				    </if>
 				  </where>
-			ORDER BY sabun
+				
 	</select>
 	<!-- 공통 코드 가져오기 -->
 	<select id="getCommonCode" resultType="pm.insa.com.vo.PubVo">

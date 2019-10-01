@@ -20,9 +20,9 @@ public interface PmMapper {
 	//인사 조회
 	public void select();
 	//리스트 조회
-	public List<Member> getAll();
+	public List<PmVo> getAll();
 	//검색 리스트
-	public List<PmVo> search(SearchVo svo);
+	public List<PmVo> search(SearchVo searchVo);
 	//공통 테이블
 	public List<PubVo> getCommonCode();
 	//삭제
